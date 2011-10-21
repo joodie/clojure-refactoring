@@ -52,7 +52,7 @@
 (defun get-sexp ()
   (if mark-active
       (substring-no-properties (delete-and-extract-region (mark) (point)))
-    (let ((out (format "%S" (sexp-at-point))))
+    (let ((out (slime-sexp-at-point)))
       (forward-kill-sexp)
       out)))
 
