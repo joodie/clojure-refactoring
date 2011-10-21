@@ -112,7 +112,9 @@
        (clojure-refactoring-call-with-string-args
         "thread-expression"
         (format "thread-%s" str)
-        body)))))
+        body))
+      (beginning-of-defun)
+      (indent-sexp))))
 
 (defun clojure-refactoring-thread-last ()
   (interactive)
