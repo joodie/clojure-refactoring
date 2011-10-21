@@ -43,8 +43,11 @@
 
 (defun clojure-refactoring-ido ()
   (interactive)
-  (let ((refactoring (ido-completing-read "Refactoring: " clojure-refactoring-refactorings-list nil t)))
-    (funcall (intern (concat "clojure-refactoring-" refactoring)))))
+  (if (and (fboundp 'slime-connected-p)
+           (slime-connected-p))
+      (let ((refactoring (ido-completing-read "Refactoring: " clojure-refactoring-refactorings-list nil t)))
+        (funcall (intern (concat "clojure-refactoring-" refactoring))))
+    (error "clojure-refactoring needs a SLIME connection.")))
 
 (defun get-sexp ()
   (if mark-active
