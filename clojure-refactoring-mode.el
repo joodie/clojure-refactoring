@@ -78,16 +78,6 @@
   (clojure-refactoring-call
    (apply 'clojure-refactoring-format-call-with-string-args args)))
 
-(defun clojure-refactoring-quote (s)
-  (format "'%s" s))
-
-(defun clojure-refactoring-format-call-with-quoted-args (ns name &rest args)
-  (apply 'clojure-refactoring-format-clojure-call ns name (mapcar #'clojure-refactoring-quote args)))
-
-(defun clojure-refactoring-call-with-quoted-args (&rest args)
-  (clojure-refactoring-call
-   (apply 'clojure-refactoring-format-call-with-quoted-args args)))
-
 (defun clojure-refactoring-insert-sexp (s)
   (insert (read s)))
 
@@ -224,7 +214,7 @@
 
 (defvar clojure-refactoring-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-r") 'clojure-refactoring-ido)
+    (define-key map (kbd "C-c C-f") 'clojure-refactoring-ido)
     map)
   "Keymap for Clojure refactoring mode.")
 

@@ -53,7 +53,7 @@ Put clojure-refactoring-mode.el somewhere on your load path and add
     (require 'clojure-refactoring-mode)
 into your .emacs.
 
-Clojure-refactoring-ido will then be bound to C-c C-r.
+Clojure-refactoring-ido will then be bound to C-c C-f.
 
 Note that global rename will be slow at first, as it has to read the
 source files into a cached.
