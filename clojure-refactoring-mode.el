@@ -38,19 +38,6 @@
 (defun clojure-refactoring-eval-sync (string)
   (slime-eval `(swank:eval-and-grab-output ,string)))
 
-(defun escape-string-literals (string)
-  (substring-no-properties
-   (with-temp-buffer
-     (insert (substring-no-properties string))
-     (beginning-of-buffer)
-     (buffer-string)
-     (while (search-forward-regexp  "\\\\*\042" nil t)
-       (replace-match "\"")
-       (backward-char)
-       (insert "\\")
-       (forward-char))
-     (buffer-string))))
-
 (setq clojure-refactoring-refactorings-list
       (list "extract-fn" "thread-last" "extract-global" "thread-first" "unthread" "extract-local" "destructure-map" "rename" "global-rename"))
 
@@ -61,9 +48,8 @@
 
 (defun get-sexp ()
   (if mark-active
-      (escape-string-literals (delete-and-extract-region (mark) (point)))
-    (let (out (escape-string-literals
-               (format "%s" (sexp-at-point))))
+      (substring-no-properties (delete-and-extract-region (mark) (point)))
+    (let ((out (format "%S" (sexp-at-point))))
       (forward-kill-sexp)
       out)))
 
@@ -77,7 +63,8 @@
 
 ;;formatting
 (defun clojure-refactoring-wrap-as-string (s)
-  (format "\"%s\"" s))
+  (assert (stringp s))
+  (format "%S" s))
 
 (defun clojure-refactoring-format-clojure-call (ns name &rest args)
   (concat
@@ -104,13 +91,11 @@
 (defun clojure-refactoring-insert-sexp (s)
   (insert (read s)))
 
-;; FIXME: this will break if there's an escaped \" in any of the code
-;; it reads.
 (defun clojure-refactoring-extract-fn ()
   "Extracts a function."
   (interactive)
   (let ((fn-name (read-from-minibuffer "Function name: "))
-        (defn (escape-string-literals (slime-defun-at-point)))
+        (defn (slime-defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
@@ -152,8 +137,7 @@
           (new-name (read-from-minibuffer "New name: ")))
       (beginning-of-defun)
       (mark-sexp)
-      (let ((body (escape-string-literals
-                   (buffer-substring-no-properties (mark t) (point)))))
+      (let ((body (buffer-substring-no-properties (mark t) (point))))
         (forward-kill-sexp)
         (clojure-refactoring-insert-sexp
          (clojure-refactoring-call-with-string-args
@@ -193,7 +177,7 @@
 
 (defun clojure-refactoring-extract-local ()
   (let ((var-name (read-from-minibuffer "Variable name: "))
-        (defn (escape-string-literals (slime-defun-at-point)))
+        (defn (slime-defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
@@ -208,7 +192,7 @@
 
 (defun clojure-refactoring-destructure-map ()
   (let ((var-name (read-from-minibuffer "Map name: "))
-        (defn (escape-string-literals (slime-defun-at-point))))
+        (defn (slime-defun-at-point)))
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
