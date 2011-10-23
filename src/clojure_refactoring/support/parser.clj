@@ -6,15 +6,15 @@
            :main :expr*}          
           :expr- #{:atom :list :vector :set :string :regex :map :meta :quote :char
                    :syntax-quote :unquote :unquote-splicing :deprecated-meta
-                   :deref :var :fn}
+                     :deref :var :fn}
           :atom #"[a-zA-Z0-9!$%&*+\-\./:<=>?_][a-zA-Z0-9!$%&*+\-\./:<=>?_#]*"
           :comment #"(#!|;)[^\n]*"
           :whitespace [#"[ \t\n,]+"]
           :list ["(" :expr* ")"]
           :vector ["[" :expr* "]"]
           :set ["#{" :expr* "}"]
-          :regex #"#\"([^\"\\]|(\\.))*\""
-          :string #"\"([^\"\\]|(\\.))*\""
+          :regex #"#\"([^\"\\]*|(\\.))*\""
+          :string #"\"([^\"\\]*|(\\.))*\""
           :pair- [:expr :expr]
           :map ["{" :pair* "}"]
           :discard ["#_" :expr]
