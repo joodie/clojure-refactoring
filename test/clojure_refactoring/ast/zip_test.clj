@@ -5,7 +5,7 @@
   (:require [clojure-refactoring.ast :as ast])
   (:use clojure.test))
 
-(use-fixtures :once #(time %))
+(use-fixtures :once #(time (%)))
 
 (deftest find-node-finds-the-first-instance-of-a-node-in-a-zipper
   (is (=

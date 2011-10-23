@@ -6,10 +6,11 @@
   (:require [clojure.core :as core])
   (:use [clojure-refactoring.support.core
          :exclude [sub-nodes tree-contains?]])
-  (:require [clojure-refactoring.support.parser :as parser]))
+  (:require [clojure-refactoring.support.parser :as parser])
+  (:import net.cgrand.parsley.Node))
 
 (defn make-node [tag content]
-  {:tag tag :content content})
+  (Node. tag content))
 
 (defn symbol [sym]
   (make-node :atom (core/list (name sym))))

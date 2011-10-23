@@ -71,11 +71,17 @@
 
 (deftest parsley_list
   (is (= (ast/list [1 2 3])
-'{:tag :list, :content ("(" 1 {:tag :whitespace, :content (" ")} 2 {:tag :whitespace, :content (" ")} 3 ")")})))
+         (ast/make-node :list ["("
+                               1 (ast/make-node :whitespace [" "])
+                               2 (ast/make-node :whitespace [" "])
+                               3 ")"]))))
 
 (deftest parsley_vector
   (is (= (ast/vector [1 2 3])
-'{:tag :vector, :content ("[" 1 {:tag :whitespace, :content (" ")} 2 {:tag :whitespace, :content (" ")} 3 "]")})))
+         (ast/make-node :vector ["["
+                               1 (ast/make-node :whitespace [" "])
+                               2 (ast/make-node :whitespace [" "])
+                               3 "]"]))))
 
 (deftest parsley_binding_node?
   (is (ast/binding-node? (parser/parse1 "(let [a 1] a)"))))
