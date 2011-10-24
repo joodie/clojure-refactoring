@@ -23,9 +23,9 @@
 ;; HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 ;; STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-;; OF THE POSSIBILITY OF SUCH DAMAGE.(
+;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
-ns clojure-refactoring.support.find-bindings-above-node
+(ns clojure-refactoring.support.find-bindings-above-node
   (:use [clojure-refactoring.support core]
         clojure-refactoring.ast.zip)
   (:require [clojure.zip :as zip])
