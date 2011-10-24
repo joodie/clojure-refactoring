@@ -1,3 +1,11 @@
+# NOTICE OF DEPRECATION
+
+This version of clojure-refactoring is deprecated. Up to date versions
+can be found at https://github.com/joodie/clojure-refactoring
+
+# END OF NOTE
+
+
 Clojure Refactoring Mode
 ------------------------
 
