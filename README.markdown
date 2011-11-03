@@ -89,6 +89,8 @@ v0.6.2
     functions and take arguments where needed.
   - ido is no longer required
   - renamed clojure-refactoring-ido to clojure-refactoring-prompt
+  - clojure-refactoring-prompt allows quick selection (partial 
+    completion) of alternatives when run under ido-mode
 
 v0.6.1 
   - bug fix release
