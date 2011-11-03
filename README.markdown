@@ -88,6 +88,7 @@ Changes since 0.6.0
 ---
 
 v0.6.2 
+
   * all refactorings are now implemented as interactive elisp 
     functions and take arguments where needed.
   * ido is no longer required
@@ -96,9 +97,11 @@ v0.6.2
     completion) of alternatives when run under ido-mode
 
 v0.6.1 
+
   * bug fix release
 
 v0.6.0
+
   * licensing updates, parsing fixes, general maintenance
 
 License
