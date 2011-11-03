@@ -47,7 +47,7 @@ Add clojure refactoring mode into lein's dev-dependencies then run
 For example (inside `project.clj`)
 
     :dev-dependencies [[swank-clojure "1.2.1"]
-                       [joodie/clojure-refactoring "0.6.1"]]
+                       [joodie/clojure-refactoring "0.6.2"]]
 
 Usage
 ---
