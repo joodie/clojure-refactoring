@@ -53,12 +53,17 @@
 (setq clojure-refactoring-refactorings-list
       (list "extract-fn" "thread-last" "extract-global" "thread-first" "unthread" "extract-local" "destructure-map" "rename" "global-rename"))
 
-(defun clojure-refactoring-ido ()
+(setq clojure-refactoring-refactorings-alist
+      (mapcar (lambda (refactoring) (list refactoring))
+              clojure-refactoring-refactorings-list))
+
+(defun clojure-refactoring-prompt ()
   (interactive)
   (if (and (fboundp 'slime-connected-p)
            (slime-connected-p))
-      (let ((refactoring (ido-completing-read "Refactoring: " clojure-refactoring-refactorings-list nil t)))
-        (funcall (intern (concat "clojure-refactoring-" refactoring))))
+      (let ((refactoring (completing-read "Refactoring: " clojure-refactoring-refactorings-alist nil nil)))
+        (when (not (string= "" refactoring))
+          (call-interactively (intern (concat "clojure-refactoring-" refactoring)))))
     (error "clojure-refactoring needs a SLIME connection.")))
 
 (defun get-sexp ()
@@ -96,11 +101,10 @@
 (defun clojure-refactoring-insert-sexp (s)
   (insert (read s)))
 
-(defun clojure-refactoring-extract-fn ()
+(defun clojure-refactoring-extract-fn (fn-name)
   "Extracts a function."
-  (interactive)
-  (let ((fn-name (read-from-minibuffer "Function name: "))
-        (defn (slime-defun-at-point))
+  (interactive "sFunction name: ")
+  (let ((defn (slime-defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
@@ -137,11 +141,10 @@
   (read-from-minibuffer "Old name: "
                         (symbol-name (symbol-at-point))))
 
-(defun clojure-refactoring-rename ()
-  (interactive)
+(defun clojure-refactoring-rename (new-name)
+  (interactive "sNew name: ")
   (save-excursion
-    (let ((old-name (clojure-refactoring-read-symbol-at-point))
-          (new-name (read-from-minibuffer "New name: ")))
+    (let ((old-name (clojure-refactoring-read-symbol-at-point)))
       (beginning-of-defun)
       (mark-sexp)
       (let ((body (buffer-substring-no-properties (mark t) (point))))
@@ -157,10 +160,9 @@
 (defun clojure-refactoring-reload-all-user-ns ()
   (clojure-refactoring-eval-sync "(require 'clojure-refactoring.support.source)(clojure-refactoring.support.source/reload-all-user-ns)"))
 
-(defun clojure-refactoring-global-rename ()
-  (interactive)
-  (let ((old-name (clojure-refactoring-read-symbol-at-point))
-        (new-name (read-from-minibuffer "New name: ")))
+(defun clojure-refactoring-global-rename (new-name)
+  (interactive "sNew name: ")
+  (let ((old-name (clojure-refactoring-read-symbol-at-point)))
     (save-some-buffers 't)
     (let ((expr (format "(require 'clojure-refactoring.rename) (ns clojure-refactoring.rename) (global-rename '%s '%s '%s)"
                         (slime-current-package) old-name new-name)))
@@ -170,9 +172,9 @@
   (save-some-buffers 't)
   (clojure-refactoring-reload-all-user-ns))
 
-(defun clojure-refactoring-extract-global ()
-  (let ((var-name (read-from-minibuffer "Variable name: "))
-        (body (delete-and-extract-region (mark t) (point))))
+(defun clojure-refactoring-extract-global (var-name)
+  (interactive "sVariable name: ")
+  (let ((body (delete-and-extract-region (mark t) (point))))
     (save-excursion
       (beginning-of-buffer)
       (forward-sexp)
@@ -182,9 +184,9 @@
       (paredit-mode 1))
     (insert var-name)))
 
-(defun clojure-refactoring-extract-local ()
-  (let ((var-name (read-from-minibuffer "Variable name: "))
-        (defn (slime-defun-at-point))
+(defun clojure-refactoring-extract-local (var-name)
+  (interactive "sVarable name: ")
+  (let ((defn (slime-defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
@@ -197,9 +199,9 @@
         body
         var-name)))))
 
-(defun clojure-refactoring-destructure-map ()
-  (let ((var-name (read-from-minibuffer "Map name: "))
-        (defn (slime-defun-at-point)))
+(defun clojure-refactoring-destructure-map (map-name)
+  (interactive "sMap name: ")
+  (let ((defn (slime-defun-at-point)))
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
@@ -229,7 +231,7 @@
 
 (defvar clojure-refactoring-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-f") 'clojure-refactoring-ido)
+    (define-key map (kbd "C-c C-f") 'clojure-refactoring-prompt)
     map)
   "Keymap for Clojure refactoring mode.")
 
