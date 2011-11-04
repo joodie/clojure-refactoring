@@ -87,6 +87,11 @@ swank.
 Changes since 0.6.0
 ---
 
+v0.6.3
+
+  * this code can now be installed as a leiningen plugin and hooks
+    into clojure-jack-in with no more configuration required.
+
 v0.6.2 
 
   * all refactorings are now implemented as interactive elisp 
