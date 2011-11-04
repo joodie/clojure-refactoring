@@ -37,7 +37,7 @@ Easy Installation
 
 This mode can be installed as a leiningen plugin:
 
-    lein plugin install joodie/clojure-refactoring 0.6.3-SNAPSHOT
+    lein plugin install joodie/clojure-refactoring 0.6.3
 
 The `clojure-refactoring` Emacs functions will then be available
 whenever you run `clojure-jack-in` to start a SLIME session.
