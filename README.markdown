@@ -64,10 +64,13 @@ at point.
 Having ido-mode enabled is recommended when using 
 clojure-refactoring-prompt.
 
-In general, this code is tested to work on
-[http://emacsformacosx.com/builds](emacs-24 pretest on OSX) with
-[https://github.com/technomancy/emacs-starter-kit](`starter-kit-lisp`
-version 2)
+In general, this code is tested to work on 
+[emacs-24 pretest on OSX] [emacs-osx] with 
+[`starter-kit-lisp` version 2] [starter-kit] from [marmalade] [marmalade].
+
+[emacs-osx]: http://emacsformacosx.com/builds
+[starter-kit]: https://github.com/technomancy/emacs-starter-kit
+[marmalade]: http://marmalade-repo.org/
 
 Customized Installation
 ---
