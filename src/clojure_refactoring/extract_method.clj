@@ -51,12 +51,14 @@
 
 (defn- make-fn-node [name args body]
   "Creates an ast representing the new function"
-  (format-ast
-   (ast/list-without-whitespace
-    (ast/symbol 'defn)
+  (ast/list
+   [(ast/symbol 'defn)
+    ast/whitespace
     name
+    (ast/make-node :whitespace ["\n  "])
     (ast/vector args)
-    (ast/strip-whitespace body))))
+    (ast/make-node :whitespace ["\n  "])
+    body]))
 
 (defn call-extracted [body toplevel extracted]
   (ast/tree-replace
