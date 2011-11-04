@@ -112,7 +112,8 @@
       (clojure-refactoring-insert-sexp
        (clojure-refactoring-call-with-string-args
         "extract-method" "extract-method"
-        defn body fn-name)))))
+        defn body fn-name)))
+    (indent-sexp)))
 
 (defun clojure-refactoring-thread-expr (str)
   (let ((body (get-sexp)))
