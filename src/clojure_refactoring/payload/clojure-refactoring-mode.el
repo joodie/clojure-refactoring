@@ -241,7 +241,10 @@
 
 (progn (defun clojure-refactoring-enable ()
          (clojure-refactoring-mode t))
-       (add-hook 'clojure-mode-hook 'clojure-refactoring-enable))
+       (add-hook 'clojure-mode-hook 'clojure-refactoring-enable)
+       (add-hook 'slime-mode-hook '(lambda () (when (and (string= "Clojure" mode-name)
+                                                    (not (bound-and-true-p clojure-refactoring-mode)))
+                                           (clojure-refactoring-enable)))))
 
 (provide 'clojure-refactoring-mode)
 ;;; clojure-refactoring-mode.el ends here
