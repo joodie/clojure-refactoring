@@ -1,7 +1,8 @@
 Clojure Refactoring Mode
 ------------------------
 
-Provides automated refactoring for clojure code.
+Provides automated refactoring for clojure code in Emacs/SLIME with
+clojure-mode.
 
 Available refactorings
 ----------------------
@@ -31,34 +32,22 @@ keywords.
 
 Rename - Changes a name just in this sexp.
 
-Emacs dependancies
----
-Slime, a running clojure connection, paredit, and thing at point.
-
-Having ido-mode enabled is recommended when using 
-clojure-refactoring-prompt.
-
-Installation
+Easy Installation
 ---
 
-Add clojure refactoring mode into lein's dev-dependencies then run
-`lein deps`
+This mode can be installed as a leiningen plugin:
 
-For example (inside `project.clj`)
+    lein plugin install joodie/clojure-refactoring 0.6.3-SNAPSHOT
 
-    :dev-dependencies [[swank-clojure "1.2.1"]
-                       [joodie/clojure-refactoring "0.6.2"]]
+The `clojure-refactoring` Emacs functions will then be available
+whenever you run `clojure-jack-in` to start a SLIME session.
 
 Usage
 ---
 
-Put `clojure-refactoring-mode.el` somewhere on your load path and add
-
-    (require 'clojure-refactoring-mode)
-
-into your `.emacs` or `.emacs.d/init.el`.
-
-clojure-refactoring-prompt will then be bound to `C-c C-f`.
+`clojure-refactoring-prompt` will be bound to `C-c C-f` when you're
+running SLIME. Press `C-c C-f` at some point in the code and you will
+be prompted to select a refactoring.
 
 Note that global rename will be slow at first, as it has to read the
 source files into a cached.
@@ -66,6 +55,29 @@ source files into a cached.
 NOTE: Still in alpha, has some breakages. Report any problems via
 Github Issues please.
 
+Emacs dependencies
+---
+
+clojure-mode (with swank-clojure 1.3.3 or higher), paredit, and thing
+at point.
+
+Having ido-mode enabled is recommended when using 
+clojure-refactoring-prompt.
+
+In general, this code is tested to work on
+[http://emacsformacosx.com/builds](emacs-24 pretest on OSX) with
+[https://github.com/technomancy/emacs-starter-kit](`starter-kit-lisp`
+version 2)
+
+Customized Installation
+---
+
+If you don't want to use `clojure-jack-in`, you should install the
+jar as usual (either as a dependency in your project or as a leiningen
+plugin) and then extract
+`src/clojure_refactoring/payload/clojure-refactoring-mode.el` and put
+that on your elisp load-path (for instance, `$HOME/.emacs.d`) and 
+`(require 'clojure-refactoring-mode)` in your emacs's `init.el`.
 
 Hacking Philosophy
 --------------------
@@ -113,7 +125,7 @@ License
 ---
 
     Copyright (C) 2009-2010 Tom Crayford,
-          (C) 2011 Joost Diepenmaat, Zeekat Softwareontwikkeling
+              (C) 2011 Joost Diepenmaat, Zeekat Softwareontwikkeling
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
