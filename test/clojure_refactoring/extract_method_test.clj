@@ -38,7 +38,8 @@
   (is (= (extract-method
           "(defn add [s]
 (let [a 1] (+ a 1)))" "(+ a 1)" "add-number")
-"(defn add-number [a]
+"(defn add-number
+  [a]
   (+ a 1))
 
 (defn add [s]
@@ -51,7 +52,8 @@
 (for [x (re-split #\",\" s)] (Integer. x)))"
 "(Integer. x)"
 "to-i")
-"(defn to-i [x]
+"(defn to-i
+  [x]
   (Integer. x))
 
 (defn add [s]
@@ -62,7 +64,8 @@
 (for [x (re-split #\",\" s)] (Integer. x)))"
 "(re-split #\",\" s)"
 "split-string")
-"(defn split-string [s]
+"(defn split-string
+  [s]
   (re-split #\",\" s))
 
 (defn add [s]
@@ -73,5 +76,5 @@
   (is (= (extract-method
           "(defn a [s] (if (.contains s \",\") 1 s))"
           "(if (.contains s \",\") 1 s)"
-          "b")
-"(defn b [s]\n  (if (.contains s \",\") 1 s))\n\n(defn a [s] (b s))")))
+          "b")         
+         "(defn b\n  [s]\n  (if (.contains s \",\") 1 s))\n\n(defn a [s] (b s))")))

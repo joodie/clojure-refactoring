@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2011 Joost Diepenmaat
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -51,14 +52,14 @@
 
 (defn- make-fn-node [name args body]
   "Creates an ast representing the new function"
-  (ast/list
-   [(ast/symbol 'defn)
-    ast/whitespace
-    name
-    (ast/make-node :whitespace ["\n  "])
-    (ast/vector args)
-    (ast/make-node :whitespace ["\n  "])
-    body]))
+  (ast/list-without-whitespace
+   (ast/symbol 'defn)
+   ast/whitespace
+   name
+   (ast/make-node :whitespace ["\n  "])
+   (ast/vector args)
+   (ast/make-node :whitespace ["\n  "])
+   body))
 
 (defn call-extracted [body toplevel extracted]
   (ast/tree-replace
