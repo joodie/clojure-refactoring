@@ -102,7 +102,8 @@
   (insert (read s)))
 
 (defun clojure-refactoring-extract-fn (fn-name)
-  "Extracts a function."
+  "Extracts the expression at point into a function. Moves point
+to args of new function (where the doc string should be)."
   (interactive "sFunction name: ")
   (let ((defn (slime-defun-at-point))
         (body (get-sexp)))
@@ -113,7 +114,9 @@
        (clojure-refactoring-call-with-string-args
         "extract-method" "extract-method"
         defn body fn-name)))
-    (indent-sexp)))
+    (indent-sexp)
+    (next-line)
+    (right-char 2)))
 
 (defun clojure-refactoring-thread-expr (str)
   (let ((body (get-sexp)))
