@@ -50,7 +50,7 @@ running SLIME. Press `C-c C-f` at some point in the code and you will
 be prompted to select a refactoring.
 
 Note that global rename will be slow at first, as it has to read the
-source files into a cached.
+source files into a cache.
 
 NOTE: Still in alpha, has some breakages. Report any problems via
 Github Issues please.
@@ -105,6 +105,8 @@ Changes since 0.6.0
 v0.6.5-SNAPSHOT
 
   * fix tests and `extract-fn`
+  * move cursor to arguments / position for inline docs of
+    extracted function.
 
 v0.6.4
 
