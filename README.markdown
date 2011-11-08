@@ -40,7 +40,16 @@ This mode can be installed as a leiningen plugin:
     lein plugin install joodie/clojure-refactoring 0.6.5-SNAPSHOT
 
 The `clojure-refactoring` Emacs functions will then be available
-whenever you run `clojure-jack-in` to start a SLIME session.
+whenever you run `M-x clojure-jack-in` to start a SLIME session.
+
+If you don't want to install as a leiningen plugin, you can also
+declare clojure-refactoring as a dependency in your project.clj,
+pom.xml or use some other dependency mechanism. As long as the
+clojure-refactoring jar ends up on your class path, `clojure-jack-in`
+will make sure the emacs interface is loaded.
+
+If you don't use `clojure-jack-in`, see the section "Customized
+Installation" below.
 
 Usage
 ---
@@ -75,12 +84,13 @@ In general, this code is tested to work on
 Customized Installation
 ---
 
-If you don't want to use `clojure-jack-in`, you should install the
-jar as usual (either as a dependency in your project or as a leiningen
-plugin) and then extract
+If you don't want to use `clojure-jack-in`, you should install the jar
+as usual (as a dependency in your project or as a leiningen plugin)
+and then extract
 `src/clojure_refactoring/payload/clojure-refactoring-mode.el` and put
-that on your elisp load-path (for instance, `$HOME/.emacs.d`) and 
-`(require 'clojure-refactoring-mode)` in your emacs's `init.el`.
+it on your elisp load-path (for instance, copy to or symlink from
+`$HOME/.emacs.d`) and `(require 'clojure-refactoring-mode)` in your
+emacs's `init.el`.
 
 Hacking Philosophy
 --------------------
