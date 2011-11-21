@@ -28,8 +28,8 @@
 (ns clojure-refactoring.support.source
   (:use [clojure.contrib.find-namespaces :only [find-namespaces-in-dir]]
         [clojure-refactoring.support core paths])
-  (:import java.io.File)
-  (require [clojure-refactoring.support.parser :as parser]))
+  (:require [clojure-refactoring.support.parser :as parser])
+  (:import java.io.File))
 
 (defn- find-and-load [namespace]
   (when-not (find-ns namespace)

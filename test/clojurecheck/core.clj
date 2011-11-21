@@ -1,8 +1,11 @@
-(when (= (class clojure.test/report) clojure.lang.MultiFn)
-  (eval
-   '(do (require 'clojure.test)
-       (ns clojure.test)
-       (def old-report clojure.test/report))))
+;; (when (= (class clojure.test/report) clojure.lang.MultiFn)
+;;   (eval
+;;    '(do (require 'clojure.test)
+;;         (ns clojure.test)
+;;         (def old-report clojure.test/report))))
+
+(ns clojure-refactoring.test.clojurecheck.core
+  (:use [clojure.test]))
 
 ; Copyright 2010 © Meikel Brandmeyer.
 
@@ -144,9 +147,11 @@
   [choices]
   (one-of (map constantly choices)))
 
-(def ^{:doc "Number of maximum retries to generate a valid value."
-       :added "2.0"}
-     *retries*
+(def
+  ^:dynamic
+  ^{:doc "Number of maximum retries to generate a valid value."
+    :added "2.0"}
+     retries
      2000)
 
 (defn generate
@@ -157,13 +162,13 @@
   returning a vector containing the keyword :retry."
   {:added "2.1"}
   [generator size]
-  (loop [n *retries*]
+  (loop [n retries]
     (if-not (zero? n)
       (let [[result value] (generator size)]
         (if (= result :retry)
           (recur (dec n))
           value))
-      (throw (Exception. (str "Retries exhausted (" *retries* " attempts)"))))))
+      (throw (Exception. (str "Retries exhausted (" retries " attempts)"))))))
 
 (defmacro let-gen
   "Takes a vector of let-like bindings. let-gen returns itself
@@ -302,13 +307,15 @@
   (let [f (if (fn? f) f (constantly f))]
     (comp gen f)))
 
-(def ^{:doc "Number of trials a property is tested with generated input.
+(def
+  ^:dynamic
+  ^{:doc "Number of trials a property is tested with generated input.
   Default is 1000."
-       :added "2.0"}
-     *trials*
-     100)
+    :added "2.0"}
+  trials
+  100)
 
-(defn *size-scale*
+(defn size-scale
   "The scale function used to scale up the size guidance with increasing
   trials while testing a property with generated input."
   {:added "2.0"}
@@ -332,9 +339,9 @@
         report-fn #(swap! results conj %)]
     (loop [n 1]
       (reset! results [])
-      (if (< *trials* n)
+      (if (< trials n)
         (report {:type :pass})
-        (let [input (-> n *size-scale* gen)]
+        (let [input (-> n size-scale gen)]
           (try
             (binding [report report-fn]
               (prop input))

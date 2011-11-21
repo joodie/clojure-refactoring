@@ -28,7 +28,7 @@
 
 
 (ns clojure-refactoring.support.parser
-  (:use net.cgrand.parsley ))
+  (:use net.cgrand.parsley))
 
 (def sexp
   (parser {:space [#{:whitespace :comment :discard} :*]

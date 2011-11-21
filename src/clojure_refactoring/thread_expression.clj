@@ -26,11 +26,11 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.thread-expression
-  (:use [clojure-refactoring.support core]
-        [clojure.walk :only [postwalk]]
-        clojure-refactoring.support.formatter)
-  (:require [clojure-refactoring.support.parser :as parser])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:use [clojure.walk :only [postwalk]]
+        [clojure-refactoring.support core]
+        [clojure-refactoring.support.formatter])
+  (:require [clojure-refactoring.support.parser :as parser]
+            [clojure-refactoring.ast :as ast]))
 
 (def expression-threaders '#{->> -> clojure.core/->> clojure.core/->})
 

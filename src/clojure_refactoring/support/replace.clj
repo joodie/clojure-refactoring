@@ -26,8 +26,7 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.support.replace
-  (:use [clojure-refactoring.support
-         source core paths])
+  (:use [clojure-refactoring.support source core paths])
   (:require [clojure-refactoring.ast :as ast]))
 
 (defn map-to-alist [m]
