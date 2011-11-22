@@ -1,6 +1,5 @@
 (ns clojure-refactoring.rename-test
-  (:use clojure.test
-        clojure.contrib.mock)
+  (:use clojure.test)
   (:require [clojure-refactoring.ast :as ast])
   (:require [clojure-refactoring.support.parser :as parser])
   (:use clojure-refactoring.rename :reload))

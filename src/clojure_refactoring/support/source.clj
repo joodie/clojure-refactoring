@@ -26,7 +26,7 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.support.source
-  (:use [clojure.contrib.find-namespaces :only [find-namespaces-in-dir]]
+  (:use [clojure.tools.namespace :only [find-namespaces-in-dir]]
         [clojure-refactoring.support core paths])
   (:require [clojure-refactoring.support.parser :as parser])
   (:import java.io.File))
@@ -50,6 +50,10 @@
 (defrecord NameSpaceCacheEntry [time parsley namespace])
 ;; Time is the time this cache entry was created, parsley is the
 ;; result of calling parsley after slurping the file
+
+(defn mk-cache-entry
+  [time parsley namespace]
+  (NameSpaceCacheEntry. time parsley namespace))
 
 (defn new-ns-entry [namespace]
   (let [f (filename-from-ns namespace)

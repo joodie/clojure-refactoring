@@ -28,10 +28,9 @@
 (ns clojure-refactoring.ast
   (:refer-clojure
    :exclude [symbol symbol? keyword? list vector newline conj])
-  (:use [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.contrib.str-utils :only [str-join]]
-        [clojure-refactoring.support.core :exclude [sub-nodes tree-contains?]])
+  (:use     [clojure-refactoring.support.core :exclude [sub-nodes tree-contains?]])
   (:require [clojure.core :as core]
+            [clojure.string :as str]
             [clojure-refactoring.support.parser :as parser])
   (:import net.cgrand.parsley.Node))
 
@@ -104,7 +103,7 @@
   (tree-replace (symbol old) (symbol new) ast))
 
 (defn ast->string [ast]
-  (str-join "" (filter string? (sub-nodes ast))))
+  (str/join "" (filter string? (sub-nodes ast))))
 
 (def sexp->parsley (comp parser/parse1 format-code))
 
@@ -120,7 +119,7 @@
   (tag= :atom ast))
 
 (defn- ast-content [ast]
-  (str-join "" (:content ast)))
+  (str/join "" (:content ast)))
 
 (def symbol?
      (all-of? map? parsley-atom?
@@ -163,7 +162,7 @@
 (def newline (make-node :whitespace '("\n")))
 
 (defn first-vector [ast]
-  (find-first (tag= :vector) (:content ast)))
+  (first (filter (tag= :vector) (:content ast))))
 
 (defn parsley-fn-args [ast]
   (first-vector (parsley-get-first-node ast)))

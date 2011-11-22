@@ -28,12 +28,11 @@
 (ns clojure-refactoring.local-binding
   (:use clojure.walk
         [clojure-refactoring.support core formatter]
-        [clojure.contrib.seq-utils :only (find-first)]
         [clojure-refactoring.ast :only [defparsed-fn]])
   (:require [clojure-refactoring.ast :as ast]))
 
 (defn- get-function-definition [defn-ast]
-  (find-first (ast/tag= :list) (:content defn-ast)))
+  (first (filter (ast/tag= :list) (:content defn-ast))))
 
 (defn- add-to-binding [{content :content :as binding-node}
                        value var-name]

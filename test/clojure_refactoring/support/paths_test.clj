@@ -12,7 +12,7 @@
 
 (deftest filename_from_ns
   (let [path "clojure_refactoring/support/namespaces.clj"]
-    (know "calls slime find file with a munged path"
+    (fact "calls slime find file with a munged path"
           (is (= (filename-from-ns
                   'clojure-refactoring.support.namespaces)
                  path))
