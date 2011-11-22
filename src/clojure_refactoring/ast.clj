@@ -26,14 +26,13 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.ast
-  (:use [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.contrib.str-utils :only [str-join]])
   (:refer-clojure
    :exclude [symbol symbol? keyword? list vector newline conj])
-  (:require [clojure.core :as core])
-  (:use [clojure-refactoring.support.core
-         :exclude [sub-nodes tree-contains?]])
-  (:require [clojure-refactoring.support.parser :as parser])
+  (:use [clojure.contrib.seq-utils :only [find-first]]
+        [clojure.contrib.str-utils :only [str-join]]
+        [clojure-refactoring.support.core :exclude [sub-nodes tree-contains?]])
+  (:require [clojure.core :as core]
+            [clojure-refactoring.support.parser :as parser])
   (:import net.cgrand.parsley.Node))
 
 (defn make-node [tag content]

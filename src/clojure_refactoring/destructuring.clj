@@ -26,7 +26,7 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.destructuring
-  (:use clojure.walk
+  (:use [clojure.walk]
         [clojure-refactoring.support core]
         [clojure.contrib.seq-utils :only [find-first]]
         [clojure.contrib.str-utils :only [str-join]]
