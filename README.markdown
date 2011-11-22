@@ -51,6 +51,20 @@ will make sure the emacs interface is loaded.
 If you don't use `clojure-jack-in`, see the section "Customized
 Installation" below.
 
+Clojure version issues 
+--- 
+
+The master branch of clojure-refactoring (where the releases are
+prepared) is currently untestable under clojure 1.3, due to many
+dependencies on clojure-contrib 1.2. It probably will break something
+if you try to use it on clojure 1.3, so be careful.
+
+Work is under way to get clojure-refactoring testable and working on
+both clojure 1.2 and 1.3. If you want to help out with this or just
+try it out, check out the `clojure-1.3` branch of the repository:
+
+https://github.com/joodie/clojure-refactoring/tree/clojure-1.3
+
 Usage
 ---
 
