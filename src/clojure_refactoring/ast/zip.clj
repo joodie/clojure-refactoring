@@ -28,7 +28,7 @@
 (ns clojure-refactoring.ast.zip
   (:require [clojure.zip :as zip]))
 
-(clojure.contrib.def/defalias ast-zip zip/xml-zip)
+(def ast-zip zip/xml-zip)
 
 (defn find-node [zipped-ast node]
   "Given a zipped ast, returns the loc of the first occurrence of node
