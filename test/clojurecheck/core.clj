@@ -139,9 +139,9 @@
   (one-of (map constantly choices)))
 
 (def
-  ^:dynamic
   ^{:doc "Number of maximum retries to generate a valid value."
-    :added "2.0"}
+    :added "2.0"
+    :dynamic true}
      retries
      2000)
 
@@ -298,10 +298,10 @@
     (comp gen f)))
 
 (def
-  ^:dynamic
   ^{:doc "Number of trials a property is tested with generated input.
   Default is 1000."
-    :added "2.0"}
+    :added "2.0"
+    :dynamic true}
   trials
   100)
 
