@@ -26,15 +26,13 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.support.core
-  (:use [clojure.contrib pprint]
-        [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.walk :only [postwalk-replace]]))
+  (:use [clojure.pprint]))
 
 (defn format-code
   "Outputs code roughly how a human would format it."
    [node]
   (with-out-str
-    (with-pprint-dispatch *code-dispatch*
+    (with-pprint-dispatch code-dispatch
       (pprint node))))
 
 ;; Below stolen from arc

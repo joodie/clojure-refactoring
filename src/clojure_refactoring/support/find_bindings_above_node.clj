@@ -26,10 +26,10 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.support.find-bindings-above-node
-  (:use [clojure-refactoring.support core]
-        clojure-refactoring.ast.zip)
-  (:require [clojure.zip :as zip])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:use [clojure-refactoring.support.core]
+        [clojure-refactoring.ast.zip])
+  (:require [clojure-refactoring.ast :as ast]
+            [clojure.zip :as zip]))
 
 (defn extract-binding-syms [ast]
   (if (#{"defmacro" "fn" "defn"}

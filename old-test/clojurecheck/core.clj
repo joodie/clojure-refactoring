@@ -1,9 +1,3 @@
-(when (= (class clojure.test/report) clojure.lang.MultiFn)
-  (eval
-   '(do (require 'clojure.test)
-       (ns clojure.test)
-       (def old-report clojure.test/report))))
-
 ; Copyright 2010 © Meikel Brandmeyer.
 
 ; All rights reserved.
@@ -26,8 +20,9 @@
 ; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ; DEALINGS IN THE SOFTWARE.
 
-(ns ^{:author "Meikel Brandmeyer"
-      :doc
+(ns clojurecheck.core
+  {:author "Meikel Brandmeyer"
+   :doc
       "clojurecheck - property based testing
 
   clojurecheck is an extensions to clojure.test. It provides generators
@@ -78,7 +73,6 @@
     Ran 2 tests containing 7 assertions.
     1 failures, 0 errors.
     {:type :summary, :test 2, :pass 6, :fail 1, :error 0}"}
-  clojurecheck.core
   (:refer-clojure
    :exclude (int float list vec set sorted-set hash-map sorted-map))
   (:use clojure.test))
@@ -144,9 +138,11 @@
   [choices]
   (one-of (map constantly choices)))
 
-(def ^{:doc "Number of maximum retries to generate a valid value."
-       :added "2.0"}
-     *retries*
+(def
+  ^{:doc "Number of maximum retries to generate a valid value."
+    :added "2.0"
+    :dynamic true}
+     retries
      2000)
 
 (defn generate
@@ -157,13 +153,13 @@
   returning a vector containing the keyword :retry."
   {:added "2.1"}
   [generator size]
-  (loop [n *retries*]
+  (loop [n retries]
     (if-not (zero? n)
       (let [[result value] (generator size)]
         (if (= result :retry)
           (recur (dec n))
           value))
-      (throw (Exception. (str "Retries exhausted (" *retries* " attempts)"))))))
+      (throw (Exception. (str "Retries exhausted (" retries " attempts)"))))))
 
 (defmacro let-gen
   "Takes a vector of let-like bindings. let-gen returns itself
@@ -183,9 +179,8 @@
       available to the following generator definitions."
   {:added "2.0"}
   [bindings & body]
-  (@#'clojure.core/assert-args let-gen
-                               (vector? bindings)       "a vector for its bindings"
-                               (even? (count bindings)) "an even number of forms in the bindings vector")
+  (assert (vector? bindings))
+  (assert (even? (count bindings)))
   (let [size   (gensym "size__")
         emit-g (fn [[local gen] body]
                  `(let ~[local (clojure.core/list gen size)]
@@ -302,13 +297,15 @@
   (let [f (if (fn? f) f (constantly f))]
     (comp gen f)))
 
-(def ^{:doc "Number of trials a property is tested with generated input.
+(def
+  ^{:doc "Number of trials a property is tested with generated input.
   Default is 1000."
-       :added "2.0"}
-     *trials*
-     100)
+    :added "2.0"
+    :dynamic true}
+  trials
+  100)
 
-(defn *size-scale*
+(defn size-scale
   "The scale function used to scale up the size guidance with increasing
   trials while testing a property with generated input."
   {:added "2.0"}
@@ -318,7 +315,7 @@
     (/ (inc n) 2)))
 
 (defn property*
-  "The property* driver handles the work when testing a property. It
+  "The probperty* driver handles the work when testing a property. It
   expects:
     * a descriptive message for failure reporting
     * a list of locals (also for reporting)
@@ -332,12 +329,20 @@
         report-fn #(swap! results conj %)]
     (loop [n 1]
       (reset! results [])
-      (if (< *trials* n)
+      (if (< trials n)
         (report {:type :pass})
-        (let [input (-> n *size-scale* gen)]
-          (try
-            (binding [report report-fn]
-              (prop input))
+        (let [input (-> n size-scale gen)]
+          (if-let [err (try (binding [report report-fn]
+                              (prop input)
+                              nil)          
+                            (catch Throwable t
+                              t))]
+            (report {:type    ::property-error
+                     :message msg
+                     :locals  locals
+                     :input   input
+                     :attempt n
+                     :error   err})
             (let [failures (filter #(-> % :type (not= :pass)) @results)]
               (if (seq failures)
                 (report {:type     ::property-fail
@@ -346,14 +351,7 @@
                          :input    input
                          :attempts n
                          :failures failures})
-                (recur (inc n))))
-            (catch Throwable t
-              (report {:type    ::property-error
-                       :message msg
-                       :locals  locals
-                       :input   input
-                       :attempt n
-                       :error   t}))))))))
+                (recur (inc n))))))))))
 
 (defmacro property
   "Defines a property consisting of a binding vector as for let-gen
@@ -368,6 +366,8 @@
                 (quote ~locals)
                 (let-gen ~bindings [~@locals])
                 (fn [[~@locals]] ~@body))))
+
+(defmulti old-report class)
 
 (defmethod old-report ::property-fail
   [{:keys [message locals input attempts failures] :as m}]

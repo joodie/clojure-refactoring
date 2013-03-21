@@ -3,7 +3,7 @@
   (:use [clojure-refactoring.support source paths]
         clojure.test
         clojure-refactoring.test-helpers
-        clojure.contrib.mock)
+        clojure-refactoring.mock)
   (:require [clojure-refactoring.support.parser :as parser]))
 
 (use-fixtures :once #(time (%)))
@@ -19,6 +19,7 @@
 
 (defn replacement-map-for-tests []
   (build-replacement-map 'a replace-test-fn))
+
 
 (deftest build_replacement_map
   (testing "populates the attributes correctly"

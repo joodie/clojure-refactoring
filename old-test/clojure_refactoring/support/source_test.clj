@@ -1,10 +1,9 @@
 (ns clojure-refactoring.support.source-test
-  (:use clojure-refactoring.support.source :reload)
-  (:import clojure-refactoring.support.source.NameSpaceCacheEntry)
+  (:use     clojure-refactoring.support.source :reload)
   (:use clojure-refactoring.test-helpers
         clojure-refactoring.support.paths
         clojure.test
-        clojure.contrib.mock)
+        clojure-refactoring.mock)
   (:require [clojure-refactoring.support replace replace-test])
   (:require [clojure-refactoring.support.parser :as parser]))
 
@@ -13,7 +12,7 @@
 (def a nil) ;; used to test does-ns-refer-to-var? below.
 
 (def cache-with-one-entry (atom {'a
-                                 (NameSpaceCacheEntry. 0 (parser/parse "(+ 1 2)") 'a)}))
+                                 (mk-cache-entry 0 (parser/parse "(+ 1 2)") 'a)}))
 
 (defn test-entry-from-cache []
   (parsley-from-cache 'a))
@@ -42,7 +41,7 @@
                      new-ns-entry (times 1)]))))
 
 (deftest namespaces_who_refer_to
-  (know "it requires all the namespaces in the user dir"
+  (fact "it requires all the namespaces in the user dir"
         (doall (namespaces-who-refer-to 'b))
         (provided
          [find-ns-in-user-dir (returns '[a])

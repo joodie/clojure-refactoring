@@ -26,12 +26,11 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.destructuring
-  (:use clojure.walk
+  (:use [clojure.walk]
         [clojure-refactoring.support core]
-        [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.contrib.str-utils :only [str-join]]
         [clojure-refactoring.ast :only [defparsed-fn]])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:require [clojure-refactoring.ast :as ast]
+            [clojure.string :as str]))
 
 (defn map-lookup? [ast]
   (let [content (ast/relevant-content ast)]
@@ -42,7 +41,7 @@
 (defn key->sym [kw-node]
   (ast/replace-content kw-node
     (list
-     (str-join ""
+     (str/join ""
             (drop 1 (first (:content kw-node)))))))
 
 (defn find-lookups [node]

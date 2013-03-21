@@ -27,11 +27,9 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.extract-method
-  (:use [clojure-refactoring.support core formatter
-         find-bindings-above-node]
+  (:use [clojure-refactoring.support core formatter find-bindings-above-node]
         [clojure-refactoring.ast :only [defparsed-fn]]
-        clojure.set
-        [clojure.contrib.seq-utils :only [find-first]])
+        [clojure.set])
   (:require [clojure-refactoring.ast :as ast]))
 
 (defn- find-occurences [args node]
