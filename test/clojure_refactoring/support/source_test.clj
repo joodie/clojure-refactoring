@@ -3,8 +3,7 @@
   (:use clojure-refactoring.test-helpers
         clojure-refactoring.support.paths
         clojure.test
-        clojure.contrib.mock)
-  
+        clojure-refactoring.mock)
   (:require [clojure-refactoring.support replace replace-test])
   (:require [clojure-refactoring.support.parser :as parser]))
 

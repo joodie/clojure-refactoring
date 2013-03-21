@@ -3,7 +3,7 @@
   (:use [clojure-refactoring.support source paths]
         clojure.test
         clojure-refactoring.test-helpers
-        clojure.contrib.mock)
+        clojure-refactoring.mock)
   (:require [clojure-refactoring.support.parser :as parser]))
 
 (use-fixtures :once #(time (%)))

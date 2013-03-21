@@ -1,6 +1,6 @@
 (ns clojure-refactoring.test-helpers
   (:use clojure.test
-        clojure.contrib.mock)
+        clojure-refactoring.mock)
   (:require [clojurecheck.core :as cc])
   (:import (java.io File LineNumberReader InputStreamReader PushbackReader)
            (java.lang.reflect Modifier Method Constructor)

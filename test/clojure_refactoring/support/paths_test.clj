@@ -2,7 +2,7 @@
   (:use clojure-refactoring.support.paths :reload)
   (:use clojure-refactoring.test-helpers
         clojure.test
-        clojure.contrib.mock))
+        clojure-refactoring.mock))
 
 (use-fixtures :once #(time (%)))
 
