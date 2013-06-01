@@ -317,6 +317,7 @@
     (/ n 2)
     (/ (inc n) 2)))
 
+Cannot recur across try, compiling:(clojurecheck/core.clj:349:17)
 (defn property*
   "The property* driver handles the work when testing a property. It
   expects:

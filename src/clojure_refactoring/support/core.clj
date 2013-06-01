@@ -26,7 +26,7 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.support.core
-  (:use [clojure.contrib pprint]
+  (:use [clojure.pprint]
         [clojure.contrib.seq-utils :only [find-first]]
         [clojure.walk :only [postwalk-replace]]))
 
@@ -34,7 +34,7 @@
   "Outputs code roughly how a human would format it."
    [node]
   (with-out-str
-    (with-pprint-dispatch *code-dispatch*
+    (with-pprint-dispatch code-dispatch
       (pprint node))))
 
 ;; Below stolen from arc
@@ -49,7 +49,7 @@
 
 (def ^{:doc "Takes predicates and returns a function
               that returns true if all of the predicates are true"}
-  all-of? 
+  all-of?
   (predicater-by every?))
 
 (defn sub-nodes [tree]
@@ -65,7 +65,7 @@
      #{'let 'fn 'binding 'for 'doseq 'dotimes 'defn 'loop 'defmacro
        'if-let 'when-let 'defn- 'defmethod 'defmethod-})
 
-(defn evens 
+(defn evens
   "Returns every other item of coll"
   [coll]
   (take-nth 2 coll))
@@ -91,7 +91,7 @@
   (->> (first coll)
        (conj (drop 2 coll))))
 
-(defn after-each 
+(defn after-each
   "After each item in coll that matches predicate
    add elems."
   [pred elems coll]

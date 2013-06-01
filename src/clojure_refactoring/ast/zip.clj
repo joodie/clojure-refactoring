@@ -26,9 +26,8 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.ast.zip
-  (:require [clojure.zip :as zip]))
-
-(clojure.contrib.def/defalias ast-zip zip/xml-zip)
+  (:require [clojure.zip :as zip]
+            [clojure.contrib.def]))
 
 (defn find-node [zipped-ast node]
   "Given a zipped ast, returns the loc of the first occurrence of node
@@ -40,7 +39,7 @@
 
 (defn nodes-leading-to [ast expr]
   "Returns a seq of all nodes inside node leading to expr."
-  (-> (find-node (ast-zip ast) expr)
+  (-> (find-node (zip/xml-zip ast) expr)
       zip/path))
 
 (defn zip-walk [zipper f]

@@ -9,7 +9,7 @@
 
 (deftest find-node-finds-the-first-instance-of-a-node-in-a-zipper
   (is (=
-       (->  (ast-zip
+       (->  (zip/xml-zip
              (parser/parse1 "(+ 1 2)"))
             (find-node (parser/parse1 "+"))
             zip/node)
