@@ -174,11 +174,10 @@ to args of new function (where the doc string should be)."
 (defun clojure-refactoring-thread-expr (str)
   (let ((body (get-sexp)))
     (save-excursion
-      (clojure-refactoring-insert-sexp
-       (clojure-refactoring-call-with-string-args
-        "thread-expression"
-        (format "thread-%s" str)
-        body))
+      (clojure-refactoring-call-with-string-args
+       "thread-expression"
+       (format "thread-%s" str)
+       body)
       (beginning-of-defun)
       (indent-sexp))))
 
@@ -206,16 +205,15 @@ to args of new function (where the doc string should be)."
       (mark-sexp)
       (let ((body (buffer-substring-no-properties (mark t) (point))))
         (forward-kill-sexp)
-        (clojure-refactoring-insert-sexp
-         (clojure-refactoring-call-with-string-args
-          "rename"
-          "rename"
-          body
-          old-name
-          new-name))))))
+        (clojure-refactoring-call-with-string-args
+         "rename"
+         "rename"
+         body
+         old-name
+         new-name)))))
 
 (defun clojure-refactoring-reload-all-user-ns ()
-  (clojure-refactoring-eval-sync "(require 'clojure-refactoring.support.source)(clojure-refactoring.support.source/reload-all-user-ns)"))
+  (nrepl-interactive-eval "(require 'clojure-refactoring.support.source)(clojure-refactoring.support.source/reload-all-user-ns)"))
 
 ;; To-do: remove dependencies on slime.
 ;; (defun clojure-refactoring-global-rename (new-name)
@@ -249,13 +247,12 @@ to args of new function (where the doc string should be)."
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
-      (clojure-refactoring-insert-sexp
-       (clojure-refactoring-call-with-string-args
-        "local-binding"
-        "local-wrap"
-        defn
-        body
-        var-name)))))
+      (clojure-refactoring-call-with-string-args
+       "local-binding"
+       "local-wrap"
+       defn
+       body
+       var-name))))
 
 (defun clojure-refactoring-destructure-map (map-name)
   (interactive "sMap name: ")
@@ -263,11 +260,10 @@ to args of new function (where the doc string should be)."
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
-      (clojure-refactoring-insert-sexp
-       (clojure-refactoring-call-with-string-args
-        "destructuring"
-        "destructure-map"
-        defn)))))
+      (clojure-refactoring-call-with-string-args
+       "destructuring"
+       "destructure-map"
+       defn))))
 
 (defun get-from-alist (key alist)
   (car (cdr (assoc key alist))))
@@ -291,6 +287,8 @@ to args of new function (where the doc string should be)."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-f") 'clojure-refactoring-prompt)
     (define-key map (kbd "C-c M-m") 'clojure-refactoring-extract-fn)
+    (define-key map (kbd "C-c M-v") 'clojure-refactoring-extract-local)
+    (define-key map (kbd "C-c M-r") 'clojure-refactoring-rename)
     map)
   "Keymap for Clojure refactoring mode.")
 
@@ -301,9 +299,9 @@ to args of new function (where the doc string should be)."
 (progn (defun clojure-refactoring-enable ()
          (clojure-refactoring-mode t))
        (add-hook 'clojure-mode-hook 'clojure-refactoring-enable)
-       (add-hook 'slime-mode-hook '(lambda () (when (and (string= "Clojure" mode-name)
-                                                    (not (bound-and-true-p clojure-refactoring-mode)))
-                                           (clojure-refactoring-enable)))))
+       (add-hook 'nrepl-mode-hook '(lambda () (when (and (string= "Clojure" mode-name)
+                                                         (not (bound-and-true-p clojure-refactoring-mode)))
+                                                (clojure-refactoring-enable)))))
 
 (provide 'clojure-refactoring-mode)
 ;;; clojure-refactoring-mode.el ends here
