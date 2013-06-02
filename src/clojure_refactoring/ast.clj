@@ -27,12 +27,12 @@
 
 (ns clojure-refactoring.ast
   (:use [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.contrib.str-utils :only [str-join]])
+        [clojure.contrib.str-utils :only [str-join]]
+        [clojure-refactoring.support.core
+         :exclude [sub-nodes tree-contains?]])
   (:refer-clojure
    :exclude [symbol symbol? keyword? list vector newline conj])
   (:require [clojure.core :as core])
-  (:use [clojure-refactoring.support.core
-         :exclude [sub-nodes tree-contains?]])
   (:require [clojure-refactoring.support.parser :as parser])
   (:import net.cgrand.parsley.Node))
 
@@ -42,9 +42,9 @@
 (defn symbol [sym]
   (make-node :atom (core/list (name sym))))
 
-(def empty-map (make-node :map (core/list "{" "}")))
+(def empty-map (make-node :map (core/vector "{" "}")))
 
-(def whitespace (make-node :whitespace '(" ")))
+(def whitespace (make-node :whitespace '[" "]))
 
 (def composite-tag?
      ^{:doc "Returns true if tag is from a composite node"}

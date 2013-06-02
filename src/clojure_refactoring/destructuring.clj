@@ -27,7 +27,7 @@
 
 (ns clojure-refactoring.destructuring
   (:use clojure.walk
-        [clojure-refactoring.support core]
+        [clojure-refactoring.support.core]
         [clojure.contrib.seq-utils :only [find-first]]
         [clojure.contrib.str-utils :only [str-join]]
         [clojure-refactoring.ast :only [defparsed-fn]])
@@ -41,7 +41,7 @@
 
 (defn key->sym [kw-node]
   (ast/replace-content kw-node
-    (list
+    (vector
      (str-join ""
             (drop 1 (first (:content kw-node)))))))
 
@@ -71,12 +71,12 @@
   "Adds key and value (which should be parsley nodes
   to m, which represents a parsley map."
   (ast/replace-content m
-    `("{"
-      ~key
-      ~ast/whitespace
-      ~val
-      ~ast/whitespace
-      ~@(drop 1 (:content m)))))
+                       `["{"
+                         ~key
+                         ~ast/whitespace
+                         ~val
+                         ~ast/whitespace
+                         ~@(drop 1 (:content m))]))
 
 (def relevant-content-from-canoninical-form
      (comp ast/relevant-content lookup->canoninical-form))
