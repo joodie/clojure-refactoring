@@ -42,7 +42,8 @@
   (map ast/ast->string
        (lookups-to-binding-map (find-lookups (parser/parse1 "(defn a [b] (+ (:foo b) (:bar b)))")))) => '("b{foo :foo bar :bar }"))
 
-(facts "should destructure all calls to maps"
+;;To-do: Why there is a whitespace there?
+(fact "should destructure all calls to maps"
   (destructure-map "(defn a [b] (:foo b))") => "(defn a [{foo :foo }] foo)"
-  (destructure-map "(defn a [b] (+ (:foo b) (:bar b)))") => "(defn a [{bar :bar foo :foo }] (+ foo bar))"
-  (destructure-map "(defn a [b] (+ (b :foo) (b :bar)))") => "(defn a [{bar :bar foo :foo }] (+ foo bar))")
+  (destructure-map "(defn a [b] (+ (:foo b) (:bar b)))") => "(defn a [{foo :foo bar :bar }] (+ foo bar))"
+  (destructure-map "(defn a [b] (+ (b :foo) (b :bar)))") => "(defn a [{foo :foo bar :bar }] (+ foo bar))")

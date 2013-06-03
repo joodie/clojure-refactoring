@@ -26,12 +26,33 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.destructuring
-  (:use clojure.walk
-        [clojure-refactoring.support.core]
+  (:use [clojure-refactoring.support.core]
         [clojure.contrib.seq-utils :only [find-first]]
         [clojure.contrib.str-utils :only [str-join]]
         [clojure-refactoring.ast :only [defparsed-fn]])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:require [clojure-refactoring.ast :as ast])
+  (:import net.cgrand.parsley.Node))
+
+(defn walk
+  "Adapted from clojure.walk/walk to avoid Empty Error:
+  http://stackoverflow.com/questions/16879272/how-to-postwalk-parsely-result"
+
+  [inner outer form]
+  (cond
+   (list? form) (outer (apply list (map inner form)))
+   (instance? clojure.lang.IMapEntry form) (outer (vec (map inner form)))
+   (seq? form) (outer (doall (map inner form)))
+   (map? form) (outer (into #net.cgrand.parsley.Node{} (map inner form)))
+   (coll? form) (outer (into (empty form) (map inner form)))
+   :else (outer form)))
+
+(defn postwalk [f form]
+  (walk (partial postwalk f) f form))
+
+
+(defn postwalk-replace [smap form]
+  (postwalk (fn [x] (if (contains? smap x) (smap x) x)) form))
+
 
 (defn map-lookup? [ast]
   (let [content (ast/relevant-content ast)]
