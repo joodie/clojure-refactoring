@@ -49,5 +49,5 @@
        set))
 
 (defn find-bindings-above-node [node expr]
-  (->> (find-node (ast-zip node) expr)
+  (->> (find-node (zip/xml-zip node) expr)
        bindings-above))

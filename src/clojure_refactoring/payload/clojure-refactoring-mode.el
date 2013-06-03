@@ -254,8 +254,8 @@ to args of new function (where the doc string should be)."
        body
        var-name))))
 
-(defun clojure-refactoring-destructure-map (map-name)
-  (interactive "sMap name: ")
+(defun clojure-refactoring-destructure-map ()
+  (interactive)
   (let ((defn (slime-defun-at-point)))
     (save-excursion
       (beginning-of-defun)
@@ -289,6 +289,7 @@ to args of new function (where the doc string should be)."
     (define-key map (kbd "C-c M-m") 'clojure-refactoring-extract-fn)
     (define-key map (kbd "C-c M-v") 'clojure-refactoring-extract-local)
     (define-key map (kbd "C-c M-r") 'clojure-refactoring-rename)
+    (define-key map (kbd "C-c M-d") 'clojure-refactoring-destructure-map)
     map)
   "Keymap for Clojure refactoring mode.")
 

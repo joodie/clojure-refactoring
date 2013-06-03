@@ -40,7 +40,7 @@
   (Node. tag content))
 
 (defn symbol [sym]
-  (make-node :atom (core/list (name sym))))
+  (make-node :atom (core/vector (name sym))))
 
 (def empty-map (make-node :map (core/vector "{" "}")))
 
