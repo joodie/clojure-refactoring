@@ -52,7 +52,7 @@
     (zip/replace loc (ast/symbol new-name))))
 
 (defn rename-non-shadowed [new-sym node old-name]
-  (zip-walk (ast-zip node)
+  (zip-walk (zip/xml-zip node)
             #(if (= (zip/node %) (ast/symbol old-name))
                (rename-node % new-sym) %)))
 

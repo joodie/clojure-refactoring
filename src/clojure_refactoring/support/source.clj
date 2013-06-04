@@ -26,7 +26,7 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.support.source
-  (:use [clojure.contrib.find-namespaces :only [find-namespaces-in-dir]]
+  (:use [clojure.tools.namespace :only [find-namespaces-in-dir]]
         [clojure-refactoring.support core paths])
   (:import java.io.File)
   (require [clojure-refactoring.support.parser :as parser]))
