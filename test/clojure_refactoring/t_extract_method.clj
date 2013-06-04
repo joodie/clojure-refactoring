@@ -35,14 +35,12 @@
 ;; Acceptance level testing below
 (fact "should use vars from let as arguments"
   (extract-method
-   "(defn add [s]
-(let [a 1] (+ a 1)))" "(+ a 1)" "add-number") =>
-"(defn add-number
+   "(defn add [s]\n(let [a 1] (+ a 1)))"
+   "(+ a 1)"
+   "add-number") =>
+  "(defn add-number
   [a]
-  (+ a 1))
-
-(defn add [s]
-(let [a 1] (add-number a)))")
+  (+ a 1))\n\n(defn add [s]\n(let [a 1] (add-number a)))")
 
 (fact "should not use bindings more than once"
   (extract-method
@@ -52,28 +50,18 @@
   "(defn b\n  [s]\n  (if (.contains s \",\") 1 s))\n\n(defn a [s] (b s))")
 
 
-;; (deftest works_in_list_comprehensions
-;; 	(is (= (extract-method
-;;                 "(defn add [s]
-;; (for [x (re-split #\",\" s)] (Integer. x)))"
-;; "(Integer. x)"
-;; "to-i")
-;; "(defn to-i
-;;   [x]
-;;   (Integer. x))
-
-;; (defn add [s]
-;; (for [x (re-split #\",\" s)] (to-i x)))")
-;; )
-;; (is (= (extract-method
-;;         "(defn add [s]
-;; (for [x (re-split #\",\" s)] (Integer. x)))"
-;; "(re-split #\",\" s)"
-;; "split-string")
-;; "(defn split-string
-;;   [s]
-;;   (re-split #\",\" s))
-
-;; (defn add [s]
-;; (for [x (split-string s)] (Integer. x)))"
-;; )))
+(fact "should work in list comprehensions"
+  (extract-method
+   "(defn add [s]\n(for [x (re-split #\",\" s)] (Integer. x)))"
+   "(Integer. x)"
+   "to-i") =>
+   "(defn to-i
+  [x]
+  (Integer. x))\n\n(defn add [s]\n(for [x (re-split #\",\" s)] (to-i x)))"
+  (extract-method
+   "(defn add [s]\n(for [x (re-split #\",\" s)] (Integer. x)))"
+   "(re-split #\",\" s)"
+   "split-string") =>
+   "(defn split-string
+  [s]
+  (re-split #\",\" s))\n\n(defn add [s]\n(for [x (split-string s)] (Integer. x)))" )
