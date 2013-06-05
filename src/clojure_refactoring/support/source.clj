@@ -44,12 +44,16 @@
 (defn- last-modified [namespace]
   (.lastModified (File. (filename-from-ns namespace))))
 
-(defonce ns-cache (atom {})) ;; a mapping of namespace-symbols to
+(defonce ^:dynamic ns-cache (atom {})) ;; a mapping of namespace-symbols to
 ;; cache entries
 
 (defrecord NameSpaceCacheEntry [time parsley namespace])
 ;; Time is the time this cache entry was created, parsley is the
 ;; result of calling parsley after slurping the file
+
+(defn mk-cache-entry
+  [time parsley namespace]
+  (NameSpaceCacheEntry. time parsley namespace))
 
 (defn new-ns-entry [namespace]
   (let [f (filename-from-ns namespace)
