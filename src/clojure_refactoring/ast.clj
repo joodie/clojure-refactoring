@@ -101,9 +101,6 @@
    (fn [node] (if (= node old) new node))
    ast))
 
-(defn replace-symbol-in-ast-node [old new ast]
-  (tree-replace (symbol old) (symbol new) ast))
-
 (defn ast->string [ast]
   (str-join "" (filter string? (sub-nodes ast))))
 
