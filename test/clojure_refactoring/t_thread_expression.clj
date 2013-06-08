@@ -14,10 +14,12 @@
 (def start-src "(reduce + (map #(Integer. %) s))")
 (def end-src "(->> (map #(Integer. %) s)\n   (reduce +))")
 
-(fact "should turn expr into thread last form"
-  (thread-last start-src) => end-src)
+(fact "should turn expr into thread-last form"
+  (thread-last start-src) => end-src
+  (thread-last "(reduce + (take 10 (filter even? (map #(* % %) (range)))))")
+  => "(->> (range)\n   (map #(* % %))\n   (filter even?)\n   (take 10)\n   (reduce +))" )
 
-(fact "should turn expr into thread first form"
+(fact "should turn expr into thread-first form"
   (thread-first "(+ (* c 1.8) 32)") => "(-> (* c 1.8)\n   (+ 32))")
 
 (fact "should turn thread last form back to origianl expr"

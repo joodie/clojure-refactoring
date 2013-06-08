@@ -70,11 +70,9 @@ based on what type of threading is going to be"
   (and (ast/tag= :list (position-f ast))
        (ast/tag= :list (position-f (position-f ast)))))
 
-(defn finish-threading [{content :content :as node}
-                        new-ast thread-type]
+(defn finish-threading [node new-ast thread-type]
   (let [{:keys [position-f all-but-position-f]}
-        (threading-fns-from-type thread-type)
-        useful-content (ast/relevant-content node)]
+        (threading-fns-from-type thread-type)]
     (ast/conj
      new-ast
      (position-f node)
@@ -83,10 +81,11 @@ based on what type of threading is going to be"
 (defn thread-with-type [thread-type ast]
   (let [{:keys [position-f all-but-position-f]}
         (threading-fns-from-type thread-type)]
-    (loop [node ast new-node ast/empty-list]
+    (loop [node ast
+           new-node ast/empty-list]
       (if (not-last-threading-node? node position-f)
-        (recur (position-f  node)
-               (ast/conj new-node (all-but-position-f node)))
+        (recur (position-f node)
+               (ast/conj new-node (apply ast/list-without-whitespace (all-but-position-f node))))
         (finish-threading node new-node thread-type)))))
 
 (defn thread-ast [thread-type ast]

@@ -58,7 +58,7 @@
 
 (declare walk)
 
-(defn- replacement-for-composite [tag f]
+(defn- replacement-fn [tag f]
   (if (composite-tag? tag)
     #(walk f %)
     f))
@@ -66,7 +66,7 @@
 (defn- replacement-for-content [tag f content]
   (replace-when
    (complement string?)
-   (replacement-for-composite tag f)
+   (replacement-fn tag f)
    content))
 
 (defn- walk-replace-content [f ast]
