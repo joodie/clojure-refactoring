@@ -33,9 +33,18 @@
   (:require [clojure-refactoring.support.parser :as parser])
   (:require [clojure-refactoring.ast :as ast]))
 
+(defn rename-in-ast [ast old new]
+  (ast/replace-symbol-in-ast-node
+   old
+   new
+   ast))
+
 (defn rename [node old-name new-name]
-  (ast/ast->string
-   (ast/tree-replace (parser/parse node) (symbol old-name) (symbol new-name))))
+  (let [ast (parser/parse node)
+        old (symbol old-name)
+        new (symbol new-name)]
+    (ast/ast->string
+     (rename-in-ast ast old new))))
 
 (defn rename-node [loc new-name]
   (if ((bindings-above loc) (zip/node loc))
