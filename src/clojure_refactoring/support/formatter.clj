@@ -51,25 +51,26 @@
   (not (or (not-replaced-in-threading? ast)
            (= ast (last (ast/relevant-content toplevel))))))
 
-(def threading-spacing
-     [ast/newline ast/whitespace ast/whitespace])
+(defn threading-spacing [thread-type]
+  ({'-> (concat [ast/newline] (repeat 3 ast/whitespace))
+    '->> (concat [ast/newline] (repeat 4 ast/whitespace))} thread-type))
 
-(defn format-threaded [ast]
+(defn format-threaded [thread-type ast]
   (let [with-whitespace
         (add-whitespace-to-lists ast)]
     (ast/replace-content
      with-whitespace
      (after-each #(replace-this-when-threading % with-whitespace)
-                 threading-spacing
+                 (threading-spacing thread-type)
                  (:content with-whitespace)))))
 
 (defmulti format-ast ast/first-symbol)
 
 (defmethod format-ast "->" [ast]
-           (format-threaded ast))
+           (format-threaded '-> ast))
 
 (defmethod format-ast "->>" [ast]
-           (format-threaded ast))
+           (format-threaded '->> ast))
 
 (defmethod format-ast "defn" [ast]
            (ast/replace-content
