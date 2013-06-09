@@ -1,8 +1,7 @@
-Clojure Refactoring Mode
+Old Clojure Refactoring Mode Relived
 ------------------------
 
-Provides automated refactoring for clojure code in Emacs/SLIME with
-clojure-mode.
+This forked project provides the same refactoring functionality as the original one but mostly with these improvements: new test framework Mijde, upgrade to Clojure 1.5.0, migrated from SLIME to nREPL. I know there are still many things to do to build a full-blown refactoring tool, and this repo provides only the basic functionalities. But I hope people could regard this as a very good start towards automated refactoring tool and make contributions to it. I guess it was the best repo I can find online. 
 
 Available refactorings
 ----------------------
@@ -10,7 +9,7 @@ Available refactorings
 Extract-fn - extracts the current expression and replaces it with a
 call to it.
 
-Global rename - Replaces all calls to the symbol at point (in the
+Global rename(currently unavailable) - Replaces all calls to the symbol at point (in the
 current project) with the new name.
 
 Thread-last - threads the current expression via `->>`
@@ -51,8 +50,8 @@ will make sure the emacs interface is loaded.
 If you don't use `clojure-jack-in`, see the section "Customized
 Installation" below.
 
-Clojure version issues 
---- 
+Clojure version issues
+---
 
 The master branch of clojure-refactoring (where the releases are
 prepared) is currently untestable under clojure 1.3, due to many
@@ -84,11 +83,11 @@ Emacs dependencies
 clojure-mode (with swank-clojure 1.3.3 or higher), paredit, and thing
 at point.
 
-Having ido-mode enabled is recommended when using 
+Having ido-mode enabled is recommended when using
 clojure-refactoring-prompt.
 
-In general, this code is tested to work on 
-[emacs-24 pretest on OSX] [emacs-osx] with 
+In general, this code is tested to work on
+[emacs-24 pretest on OSX] [emacs-osx] with
 [`starter-kit-lisp` version 2] [starter-kit] from [marmalade] [marmalade].
 
 [emacs-osx]: http://emacsformacosx.com/builds
@@ -144,16 +143,16 @@ v0.6.3
   * this code can now be installed as a leiningen plugin and hooks
     into clojure-jack-in with no more configuration required.
 
-v0.6.2 
+v0.6.2
 
-  * all refactorings are now implemented as interactive elisp 
+  * all refactorings are now implemented as interactive elisp
     functions and take arguments where needed.
   * ido is no longer required
   * renamed clojure-refactoring-ido to clojure-refactoring-prompt
-  * clojure-refactoring-prompt allows quick selection (partial 
+  * clojure-refactoring-prompt allows quick selection (partial
     completion) of alternatives when run under ido-mode
 
-v0.6.1 
+v0.6.1
 
   * bug fix release
 

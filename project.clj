@@ -1,5 +1,5 @@
-(defproject joodie/clojure-refactoring "0.9."
-  :description "Clojure refactoring for Emacs/SLIME"
+(defproject joodie/clojure-refactoring "0.9.0"
+  :description "Clojure refactoring for Emacs/nREPL"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [net.cgrand/parsley "0.9.1"]]
