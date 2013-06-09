@@ -2,7 +2,6 @@
   (:require [clojure-refactoring.ast :as ast]
             [clojure-refactoring.support.parser :as parser])
   (:use midje.sweet
-;;        clojure-refactoring.test-helpers
         [clojure-refactoring.support core source paths]))
 
 (fact "should return true if it is a keyword"

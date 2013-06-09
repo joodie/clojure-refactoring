@@ -108,6 +108,24 @@
 (defun clojure-refactoring-nrepl-call (form)
   (nrepl-interactive-eval-read-print form))
 
+(defun nrepl-interactive-eval-read-replace (form)
+  "Evaluate the given FORM and process global replacement"
+  (let ((buffer (current-buffer)))
+    (nrepl-send-string form
+                       (nrepl-interactive-eval-read-replace-handler buffer)
+                       nrepl-buffer-ns)))
+
+(defun nrepl-interactive-eval-read-replace-handler (buffer)
+  "Make a handler for evaluating and process global replacement."
+  (nrepl-make-response-handler buffer
+                               (lambda (buffer value)
+                                 (let ((sexp (read value)))
+                                   (clojure-refactoring-process-global-replacements sexp)))
+                               '()
+                               (lambda (buffer err)
+                                 (message "%s" err))
+                               '()))
+
 (defun nrepl-interactive-eval-read-print (form)
   "Evaluate the given FORM and print sexp read from form string in current buffer."
   (let ((buffer (current-buffer)))
@@ -215,18 +233,14 @@ to args of new function (where the doc string should be)."
 (defun clojure-refactoring-reload-all-user-ns ()
   (nrepl-interactive-eval "(require 'clojure-refactoring.support.source)(clojure-refactoring.support.source/reload-all-user-ns)"))
 
-;; To-do: remove dependencies on slime.
-;; (defun clojure-refactoring-global-rename (new-name)
-;;   (interactive "sNew name: ")
-;;   (let ((old-name (clojure-refactoring-read-symbol-at-point)))
-;;     (save-some-buffers 't)
-;;     (let ((expr (format "(require 'clojure-refactoring.rename) (ns clojure-refactoring.rename) (global-rename '%s '%s '%s)"
-;;                         (slime-current-package) old-name new-name)))
-;;       (clojure-refactoring-process-global-replacements
-;;        (read (clojure-refactoring-call
-;;               expr)))))
-;;   (save-some-buffers 't)
-;;   (clojure-refactoring-reload-all-user-ns))
+(defun clojure-refactoring-global-rename (new-name)
+  (interactive "sNew name: ")
+  (let ((old-name (clojure-refactoring-read-symbol-at-point)))
+    (save-some-buffers 't)
+    (let ((expr (format "(require 'clojure-refactoring.rename) (ns clojure-refactoring.rename) (global-rename '%s '%s '%s)"
+                        (nrepl-find-ns) old-name new-name)))
+      (nrepl-interactive-eval-read-replace expr)))
+  (clojure-refactoring-reload-all-user-ns))
 
 (defun clojure-refactoring-extract-global (var-name)
   (interactive "sVariable name: ")
@@ -289,6 +303,7 @@ to args of new function (where the doc string should be)."
     (define-key map (kbd "C-c M-m") 'clojure-refactoring-extract-fn)
     (define-key map (kbd "C-c M-v") 'clojure-refactoring-extract-local)
     (define-key map (kbd "C-c M-r") 'clojure-refactoring-rename)
+    (define-key map (kbd "C-c M-g") 'clojure-refactoring-global-rename)
     (define-key map (kbd "C-c M-d") 'clojure-refactoring-destructure-map)
     (define-key map (kbd "C-c M-l") 'clojure-refactoring-thread-last)
     (define-key map (kbd "C-c M-f") 'clojure-refactoring-thread-first)
