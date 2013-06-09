@@ -290,6 +290,9 @@ to args of new function (where the doc string should be)."
     (define-key map (kbd "C-c M-v") 'clojure-refactoring-extract-local)
     (define-key map (kbd "C-c M-r") 'clojure-refactoring-rename)
     (define-key map (kbd "C-c M-d") 'clojure-refactoring-destructure-map)
+    (define-key map (kbd "C-c M-l") 'clojure-refactoring-thread-last)
+    (define-key map (kbd "C-c M-f") 'clojure-refactoring-thread-first)
+    (define-key map (kbd "C-c M-u") 'clojure-refactoring-unthread)
     map)
   "Keymap for Clojure refactoring mode.")
 
