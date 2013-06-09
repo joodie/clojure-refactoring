@@ -34,12 +34,10 @@ Rename - Changes a name just in this sexp.
 Easy Installation
 ---
 
-This mode can be installed as a leiningen plugin:
-
-    lein plugin install joodie/clojure-refactoring 0.6.5-SNAPSHOT
+You cat get this via [Clojar](https://clojars.org/yehe/clojure-refactoring)
 
 The `clojure-refactoring` Emacs functions will then be available
-whenever you run `M-x clojure-jack-in` to start a SLIME session.
+whenever you run `M-x clojure-jack-in` to start a nREPL session.
 
 If you don't want to install as a leiningen plugin, you can also
 declare clojure-refactoring as a dependency in your project.clj,
@@ -50,19 +48,6 @@ will make sure the emacs interface is loaded.
 If you don't use `clojure-jack-in`, see the section "Customized
 Installation" below.
 
-Clojure version issues
----
-
-The master branch of clojure-refactoring (where the releases are
-prepared) is currently untestable under clojure 1.3, due to many
-dependencies on clojure-contrib 1.2. It probably will break something
-if you try to use it on clojure 1.3, so be careful.
-
-Work is under way to get clojure-refactoring testable and working on
-both clojure 1.2 and 1.3. If you want to help out with this or just
-try it out, check out the `clojure-1.3` branch of the repository:
-
-https://github.com/joodie/clojure-refactoring/tree/clojure-1.3
 
 Usage
 ---
@@ -80,7 +65,7 @@ Github Issues please.
 Emacs dependencies
 ---
 
-clojure-mode (with swank-clojure 1.3.3 or higher), paredit, and thing
+clojure-mode (with nrepl 0.1.8), paredit, and thing
 at point.
 
 Having ido-mode enabled is recommended when using
@@ -117,48 +102,8 @@ Hacking Philosophy
 
 Known bugs
 ---
-After doing a global rename, refactoring-mode doesn't reload the
-namespaces in the right order, so there is sometimes a null pointer
-exception after doing this. For now, you can fix this by restarting
-swank.
+Global rename is currently unavailable since I haven't found a way to integrate it with nrepl. 
 
-Changes since 0.6.0
----
-
-v0.6.5-SNAPSHOT
-
-  * fix tests and `extract-fn`
-  * move cursor to arguments / position for inline docs of
-    extracted function.
-
-v0.6.4
-
-  * hook into slime-mode-hook so that the refactoring mode is
-    switched on for all clojure-mode buffers already opened when
-    clojure-jack-in is executed.
-  * keep and re-indent formatting of extracted functions
-
-v0.6.3
-
-  * this code can now be installed as a leiningen plugin and hooks
-    into clojure-jack-in with no more configuration required.
-
-v0.6.2
-
-  * all refactorings are now implemented as interactive elisp
-    functions and take arguments where needed.
-  * ido is no longer required
-  * renamed clojure-refactoring-ido to clojure-refactoring-prompt
-  * clojure-refactoring-prompt allows quick selection (partial
-    completion) of alternatives when run under ido-mode
-
-v0.6.1
-
-  * bug fix release
-
-v0.6.0
-
-  * licensing updates, parsing fixes, general maintenance
 
 License
 ---
