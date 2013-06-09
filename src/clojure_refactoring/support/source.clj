@@ -44,8 +44,11 @@
 (defn- last-modified [namespace]
   (.lastModified (File. (filename-from-ns namespace))))
 
-(defonce ^:dynamic ns-cache (atom {})) ;; a mapping of namespace-symbols to
-;; cache entries
+ ;; a mapping of namespace-symbols to cache entries
+(defonce ^:dynamic ns-cache (atom {}))
+
+
+(defn get-ns-cache [] @ns-cache)
 
 (defrecord NameSpaceCacheEntry [time parsley namespace])
 ;; Time is the time this cache entry was created, parsley is the
@@ -66,7 +69,7 @@
   (= (last-modified (:namespace cached)) (:time cached)))
 
 (defmacro with-cached [namespace-name & body]
-  `(if-let [~'cached (@ns-cache ~namespace-name)]
+  `(if-let [~'cached ((get-ns-cache) ~namespace-name)]
      ~@body))
 
 (defn in-time? [namespace-name]
