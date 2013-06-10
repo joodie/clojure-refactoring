@@ -1,5 +1,6 @@
 language: clojure
-script: "lein midje"
+lein: lein2
+script: "lein2 midje"
 jdk:
   - openjdk6
   - openjdk7
