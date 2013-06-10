@@ -5,5 +5,5 @@
                  [net.cgrand/parsley "0.9.1"]
                  [midje "1.5.0"]
                  [org.clojure/tools.namespace "0.2.2"]]
-  :profiles {:dev {:dependencies [[org.clojure/tools.trace "0.7.5"]]
-                   :plugins [[lein-midje "3.0.0"]]}})
+  :plugins [[lein-midje "3.0.0"]]
+  :profiles {:dev {:dependencies [[org.clojure/tools.trace "0.7.5"]]}})

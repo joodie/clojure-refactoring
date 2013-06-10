@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/luckykevin/clojure-refactoring.png)](https://travis-ci.org/luckykevin/clojure-refactoring)
+
 Old Clojure Refactoring Mode Relived
 ------------------------
 
