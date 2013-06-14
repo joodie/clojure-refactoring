@@ -67,3 +67,10 @@
        this-ns
        (find-var
         'clojure-refactoring.support.t-source/boo)) => falsey)))
+
+(fact "should return true if vars are imported by use :only in that ns"
+  (bound-in? (find-ns 'clojure-refactoring.destructuring) #'clojure.contrib.seq-utils/find-first) => truthy)
+
+;;To-fix :related to global-rename
+;; (fact "should return true if vars are imported by require :as in that ns"
+;;   (bound-in? (find-ns 'clojure-refactoring.destructuring) #'clojure-refactoring.support.parsley-walk/postwalk-replace) => truthy)

@@ -102,9 +102,6 @@
           (not (equal string ""))
           (substring-no-properties string))))
 
-(defun clojure-refactoring-call (s)
-  (car (cdr (clojure-refactoring-eval-sync s))))
-
 (defun clojure-refactoring-nrepl-call (form)
   (nrepl-interactive-eval-read-print form))
 
@@ -119,8 +116,10 @@
   "Make a handler for evaluating and process global replacement."
   (nrepl-make-response-handler buffer
                                (lambda (buffer value)
-                                 (let ((sexp (read value)))
-                                   (clojure-refactoring-process-global-replacements sexp)))
+                                 (with-current-buffer buffer
+                                     (let ((sexp (read value)))
+                                       (if sexp
+                                           (clojure-refactoring-process-global-replacements sexp)))))
                                '()
                                (lambda (buffer err)
                                  (message "%s" err))
