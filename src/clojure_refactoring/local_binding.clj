@@ -65,6 +65,7 @@
       ast/whitespace
       (ast/vector
        [var-name value])
+      ast/newline
       ast/whitespace
       form)))
 

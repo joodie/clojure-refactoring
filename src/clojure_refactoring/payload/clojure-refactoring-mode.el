@@ -45,6 +45,7 @@
 (require 'thingatpt)
 (require 'cl)
 (require 'nrepl)
+(require 'paredit)
 
 (defvar clojure-refactoring-mode-hook '()
   "Hooks to be run when loading clojure refactoring mode")
@@ -128,7 +129,10 @@
                                  (with-current-buffer buffer
                                    (let ((sexp (read value)))
                                      (if sexp
-                                         (insert sexp)))))
+                                         (progn
+                                           (insert sexp)
+                                           (beginning-of-defun)
+                                           (indent-sexp))))))
                                '()
                                (lambda (buffer err)
                                  (message "%s" err))
@@ -158,9 +162,6 @@
   (clojure-refactoring-nrepl-call
    (apply 'clojure-refactoring-format-call-with-string-args args)))
 
-(defun clojure-refactoring-insert-sexp (s)
-  (insert (read s)))
-
 (defun clojure-refactoring-extract-fn (fn-name)
   "Extracts the expression at point into a function. Moves point
 to args of new function (where the doc string should be)."
@@ -172,10 +173,7 @@ to args of new function (where the doc string should be)."
       (forward-kill-sexp)
       (clojure-refactoring-call-with-string-args
        "extract-method" "extract-method"
-       defn body fn-name))
-    (indent-sexp)
-    (next-line)
-    (right-char 2)))
+       defn body fn-name))))
 
 (defun clojure-refactoring-thread-expr (str)
   (let ((body (get-sexp)))
@@ -183,9 +181,7 @@ to args of new function (where the doc string should be)."
       (clojure-refactoring-call-with-string-args
        "thread-expression"
        (format "thread-%s" str)
-       body)
-      (beginning-of-defun)
-      (indent-sexp))))
+       body))))
 
 (defun clojure-refactoring-thread-last ()
   (interactive)

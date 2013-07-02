@@ -6,7 +6,7 @@
   (fact "should wrap code as local"
     (local-wrap "(defn a [b] (+ b (/ b 1)))"
                 "(/ b 1)"
-                "c") => "(defn a [b] (let [c (/ b 1)] (+ b c)))")
+                "c") => "(defn a [b] (let [c (/ b 1)]\n (+ b c)))")
 
   (fact "should wrap in a local let block"
     (local-wrap "(defn a [b] (let [c 1] (+ b (/ b c))))"
