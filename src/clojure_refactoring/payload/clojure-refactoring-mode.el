@@ -49,37 +49,34 @@
 (defvar clojure-refactoring-mode-hook '()
   "Hooks to be run when loading clojure refactoring mode")
 
-(defun clojure-refactoring-eval-sync (string)
-  (slime-eval `(swank:eval-and-grab-output ,string)))
-
-(setq clojure-refactoring-refactorings-list
+(setq clojure-refactoring-command-list
       (list "extract-fn" "thread-last" "extract-global" "thread-first" "unthread" "extract-local" "destructure-map" "rename" "global-rename"))
 
-(setq clojure-refactoring-refactorings-alist
+(setq clojure-refactoring-command-alist
       (mapcar (lambda (refactoring) (list refactoring))
-              clojure-refactoring-refactorings-list))
+              clojure-refactoring-command-list))
 
 (defun clojure-refactoring-prompt ()
   (interactive)
   ;;To-do: test if nrepl connection exist.
-  (let ((refactoring (completing-read "Refactoring: " clojure-refactoring-refactorings-alist nil nil)))
+  (let ((refactoring (completing-read "Refactoring: " clojure-refactoring-command-alist nil nil)))
     (when (not (string= "" refactoring))
       (call-interactively (intern (concat "clojure-refactoring-" refactoring))))))
 
 (defun get-sexp ()
   (if mark-active
       (substring-no-properties (delete-and-extract-region (mark) (point)))
-    (let ((out (slime-sexp-at-point)))
+    (let ((out (sexp-at-point)))
       (forward-kill-sexp)
       out)))
 
 ;;To-do: change the following four functions to nrepl utilities.
-(defun slime-defun-at-point ()
+(defun defun-at-point ()
    "Return the text of the defun at point."
    (apply #'buffer-substring-no-properties
-          (slime-region-for-defun-at-point)))
+          (region-for-defun-at-point)))
 
-(defun slime-region-for-defun-at-point ()
+(defun region-for-defun-at-point ()
    "Return the start and end position of defun at point."
    (save-excursion
      (save-match-data
@@ -88,19 +85,11 @@
          (beginning-of-defun)
          (list (point) end)))))
 
-(defun slime-sexp-at-point ()
+(defun sexp-at-point ()
    "Return the sexp at point as a string, otherwise nil."
-   (or (slime-symbol-at-point)
+   (or (nrepl-symbol-at-point)
        (let ((string (thing-at-point 'sexp)))
          (if string (substring-no-properties string) nil))))
-
-(defun slime-symbol-at-point ()
-   "Return the name of the symbol at point, otherwise nil."
-   ;; (thing-at-point 'symbol) returns "" in empty buffers
-   (let ((string (thing-at-point 'slime-symbol)))
-     (and string
-          (not (equal string ""))
-          (substring-no-properties string))))
 
 (defun clojure-refactoring-nrepl-call (form)
   (nrepl-interactive-eval-read-print form))
@@ -176,7 +165,7 @@
   "Extracts the expression at point into a function. Moves point
 to args of new function (where the doc string should be)."
   (interactive "sFunction name: ")
-  (let ((defn (slime-defun-at-point))
+  (let ((defn (defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
@@ -255,7 +244,7 @@ to args of new function (where the doc string should be)."
 
 (defun clojure-refactoring-extract-local (var-name)
   (interactive "sVarable name: ")
-  (let ((defn (slime-defun-at-point))
+  (let ((defn (defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
@@ -269,7 +258,7 @@ to args of new function (where the doc string should be)."
 
 (defun clojure-refactoring-destructure-map ()
   (interactive)
-  (let ((defn (slime-defun-at-point)))
+  (let ((defn (defun-at-point)))
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
