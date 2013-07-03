@@ -3,4 +3,3 @@ lein: lein2
 script: "lein2 midje"
 jdk:
   - openjdk7
-  - oraclejdk7
