@@ -4,24 +4,12 @@ Inline function.
 
 
 Ideas:
-Fix multiple defn bodies problem (map over defn bodies)
+1. Find all references(reuse from global-rename).
 
-Watch files for reloading (using something like lazytest's watcher)
+2. Find definition body.
 
-0.5 DONE
----
+3. Compose new invoking code with parameters in function body replaced by argument(reuse from rename).
 
-Rename not to rename shadowed var names.
-Use clojure.zip for tree walking.
+4. Replace.
 
-0.4.1 DONE
----
-
-Threading and extract as local to use parsley. Rework API for parsley.
-
-
-0.4 DONE
----
-
-New cache layout: map namespaces to parsley called on that namespace.
-Use new cache for implementing rename.
+3*. Find definition body based on invocation argument.
