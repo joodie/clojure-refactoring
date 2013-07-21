@@ -1,4 +1,3 @@
-
 [![Build Status](https://travis-ci.org/luckykevin/clojure-refactoring.png)](https://travis-ci.org/luckykevin/clojure-refactoring)
 
 Old Clojure Refactoring Mode Relived
@@ -12,7 +11,7 @@ Available refactorings
 Extract-fn - extracts the current expression and replaces it with a
 call to it.
 
-Global rename(currently unavailable) - Replaces all calls to the symbol at point (in the
+Global rename - Replaces all calls to the symbol at point (in the
 current project) with the new name.
 
 Thread-last - threads the current expression via `->>`
@@ -105,7 +104,7 @@ Hacking Philosophy
 
 Known bugs
 ---
-Global rename is currently unavailable since I haven't found a way to integrate it with nrepl. 
+
 
 
 License
