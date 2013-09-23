@@ -14,6 +14,7 @@
 
 ;; Copyright (c) 2009, 2010, Tom Crayford,
 ;;           (c) 2011, Joost Diepenmaat, Zeekat Softwareontwikkeling
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -59,38 +60,24 @@
 
 (defun clojure-refactoring-prompt ()
   (interactive)
-  ;;To-do: test if nrepl connection exist.
-  (let ((refactoring (completing-read "Refactoring: " clojure-refactoring-command-alist nil nil)))
-    (when (not (string= "" refactoring))
-      (call-interactively (intern (concat "clojure-refactoring-" refactoring))))))
+  (if (and (boundp 'nrepl-connection-buffer)
+           nrepl-connection-buffer)
+      (let ((refactoring (completing-read "Refactoring: " clojure-refactoring-command-alist nil nil)))
+        (when (not (string= "" refactoring))
+          (call-interactively (intern (concat "clojure-refactoring-" refactoring)))))
+    (error "clojure-refactoring needs a nREPL connection.")))
 
 (defun get-sexp ()
+  "Delete and return the innermost sexp the point is on or the mark-region"
   (if mark-active
       (substring-no-properties (delete-and-extract-region (mark) (point)))
-    (let ((out (sexp-at-point)))
+    (let ((out (nrepl-sexp-at-point)))
       (forward-kill-sexp)
       out)))
 
-;;To-do: change the following four functions to nrepl utilities.
 (defun defun-at-point ()
    "Return the text of the defun at point."
-   (apply #'buffer-substring-no-properties
-          (region-for-defun-at-point)))
-
-(defun region-for-defun-at-point ()
-   "Return the start and end position of defun at point."
-   (save-excursion
-     (save-match-data
-       (end-of-defun)
-       (let ((end (point)))
-         (beginning-of-defun)
-         (list (point) end)))))
-
-(defun sexp-at-point ()
-   "Return the sexp at point as a string, otherwise nil."
-   (or (nrepl-symbol-at-point)
-       (let ((string (thing-at-point 'sexp)))
-         (if string (substring-no-properties string) nil))))
+   (nrepl-expression-at-point))
 
 (defun clojure-refactoring-nrepl-call (form)
   (nrepl-interactive-eval-read-print form))
@@ -174,6 +161,18 @@ to args of new function (where the doc string should be)."
       (clojure-refactoring-call-with-string-args
        "extract-method" "extract-method"
        defn body fn-name))))
+
+(defun clojure-refactoring-inline ()
+  "Inline the function and move to the begining of the expression"
+  (interactive)
+  (let ((defun-at-point)
+        (call (get-sexp)))
+    (save-excursion
+      (beginning-of-defun)
+      (forward-kill-sexp)
+      (clojure-refactoring-call-with-string-args
+       "inline-method" "inline-method"
+       defn body))))
 
 (defun clojure-refactoring-thread-expr (str)
   (let ((body (get-sexp)))
@@ -292,6 +291,7 @@ to args of new function (where the doc string should be)."
     (define-key map (kbd "C-c M-l") 'clojure-refactoring-thread-last)
     (define-key map (kbd "C-c M-f") 'clojure-refactoring-thread-first)
     (define-key map (kbd "C-c M-u") 'clojure-refactoring-unthread)
+    (define-key map (kbd "C-c M-i") 'clojure-refactoring-inline)
     map)
   "Keymap for Clojure refactoring mode.")
 
