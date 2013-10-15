@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -26,11 +27,11 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.thread-expression
-  (:use [clojure-refactoring.support core]
-        [clojure.walk :only [postwalk]]
-        clojure-refactoring.support.formatter)
-  (:require [clojure-refactoring.support.parser :as parser])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:require [clojure-refactoring.ast :as ast]
+            [clojure-refactoring.support.parser :as parser]
+            [clojure-refactoring.support.formatter :refer [format-ast]]
+            [clojure.walk :refer [postwalk]]
+            [clojure-refactoring.support.core :refer [all-of? but-second format-code tree-contains?]]))
 
 (def expression-threaders '#{->> -> clojure.core/->> clojure.core/->})
 

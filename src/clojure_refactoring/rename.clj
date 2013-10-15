@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -26,12 +27,12 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.rename
-  (:use [clojure-refactoring.support replace]
-        clojure-refactoring.ast.zip
-        clojure-refactoring.support.find-bindings-above-node)
-  (:require [clojure.zip :as zip])
-  (:require [clojure-refactoring.support.parser :as parser])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:require [clojure-refactoring.ast :as ast]
+            [clojure-refactoring.support.parser :as parser]
+            [clojure.zip :as zip]
+            [clojure-refactoring.ast.zip :refer [zip-walk]]
+            [clojure-refactoring.support.find-bindings-above-node :refer [bindings-above]]
+            [clojure-refactoring.support.replace :refer [replace-callers]]))
 
 (defn rename-in-ast [ast old new]
   (ast/replace-symbol-in-ast-node

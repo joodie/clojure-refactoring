@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -26,11 +27,11 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.destructuring
-  (:use [clojure-refactoring.support.core]
-        [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.contrib.str-utils :only [str-join]]
-        [clojure-refactoring.ast :only [defparsed-fn]])
+  (:use [clojure-refactoring.support.core])
   (:require [clojure-refactoring.ast :as ast]
+            [clojure-refactoring.ast :refer [defparsed-fn]]
+            [clojure.contrib.str-utils :refer [str-join]]
+            [clojure.contrib.seq-utils :refer [find-first]]
             [clojure-refactoring.support.parsley-walk :as parsley-walk]))
 
 (defn map-lookup? [ast]
@@ -61,11 +62,15 @@
   (ast/replace-content ast
     (swap-first-with-last ast)))
 
+(defn new-fcuntion
+  [maybe-keyword lookup-ast]
+  (if (ast/keyword? maybe-keyword)
+      lookup-ast
+      (parsley-swap-first-with-last lookup-ast)))
+
 (defn lookup->canoninical-form [lookup-ast]
   (let [[maybe-keyword] (ast/relevant-content lookup-ast)]
-    (if (ast/keyword? maybe-keyword)
-      lookup-ast
-      (parsley-swap-first-with-last lookup-ast))))
+    (new-fcuntion maybe-keyword lookup-ast)))
 
 (defn add-to-parsley-map [m key val]
   "Adds key and value (which should be parsley nodes

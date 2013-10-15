@@ -14,3 +14,4 @@ clojure-refactoring*.jar
 src/clojure_refactoring/code_analysis.clj#*
 .*
 target/
+/clojure_refactoring.iml

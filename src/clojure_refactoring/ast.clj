@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions

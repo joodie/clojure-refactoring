@@ -13,34 +13,63 @@
 
 (defn remove-extracted-function-sexp [extracted toplevel new-fn]
   (ast/ast->string
-   (call-extracted
-    (parser/parse1 extracted)
-    (parser/parse1 toplevel)
-    (parser/parse1 new-fn))))
+    (call-extracted
+      (ast/sexp->parsley extracted)
+      (ast/sexp->parsley toplevel)
+      (ast/sexp->parsley new-fn))))
+
+(defn free-vars-binded-above-sexp [function extracted]
+  (map ast/ast->string
+    (free-vars-binded-above
+      (ast/sexp->parsley function)
+      (ast/sexp->parsley extracted))))
 
 
-(fact "should return the name of a function as a parsley node"
-  (fn-name-sexp '(defn a [c] c)) => 'a)
+(fact "should return the name of a function when given a toplevel function node"
+  (fn-name-sexp '(defn a [c] c)) => 'a
+  (fn-name-sexp '(def b (fn [c] c))) => 'b)
 
-(fact "should use the arguments of a function node to return a call to it."
+(fact "should return a call to a function with parameter symbols being arguments"
   (fn-call-sexp '(defn a [b] (+ 1 2))) => '(a b))
 
-
 (fact "should remove extracted expression in original toplevel function"
-  (remove-extracted-function-sexp
-   "(inc a)"
-   "(defn b [a] (inc a))"
-   "(defn arr [a] (inc a))") => "(defn b [a] (arr a))")
+  (remove-extracted-function-sexp '(inc a) '(defn b [a] (inc a)) '(defn arr
+   [a] (inc a))) => "(defn b [a] (arr a))")
+
+(fact "should return free variables in extracted-node that are binded by sexp
+above extracted-node in f-node"
+  (free-vars-binded-above-sexp '(defn add [s]\n(let [a 1] (+ a 1))) '(+ a 1))
+  => '("a")
+  (free-vars-binded-above-sexp '(defn add [a]\n(let [a 1] (+ a 1))) '(let [a
+  1] (+ a 1))) => '())
 
 ;; Acceptance level testing below
 (fact "should use vars from let as arguments"
   (extract-method
-   "(defn add [s]\n(let [a 1] (+ a 1)))"
-   "(+ a 1)"
-   "add-number") =>
+    "(defn add [s]\n(let [a 1] (+ a 1)))"
+    "(+ a 1)"
+    "add-number") =>
   "(defn add-number
   [a]
   (+ a 1))\n\n(defn add [s]\n(let [a 1] (add-number a)))")
+
+(fact "should use vars from let as arguments 2"
+  (extract-method
+    "(defn add [s]\n(let [a 1] (+ a 1)))"
+    "(let [a 1] (+ a 1))"
+    "add-number") =>
+  "(defn add-number
+  []
+  (let [a 1] (+ a 1)))\n\n(defn add [s]\n(add-number))")
+
+(fact "should use vars from let as arguments 3"
+  (extract-method
+    "(defn add [a]\n(let [a 1] (+ a 1)))"
+    "(let [a 1] (+ a 1))"
+    "add-number") =>
+  "(defn add-number
+  []
+  (let [a 1] (+ a 1)))\n\n(defn add [a]\n(add-number))")
 
 (fact "should not use bindings more than once"
   (extract-method
