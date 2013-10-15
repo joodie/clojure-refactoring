@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -27,12 +28,12 @@
 
 (ns clojure-refactoring.ast
   (:use [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.contrib.str-utils :only [str-join]])
+        [clojure.contrib.str-utils :only [str-join]]
+        [clojure-refactoring.support.core
+         :exclude [sub-nodes tree-contains?]])
   (:refer-clojure
    :exclude [symbol symbol? keyword? list vector newline conj])
   (:require [clojure.core :as core])
-  (:use [clojure-refactoring.support.core
-         :exclude [sub-nodes tree-contains?]])
   (:require [clojure-refactoring.support.parser :as parser])
   (:import net.cgrand.parsley.Node))
 
@@ -40,11 +41,11 @@
   (Node. tag content))
 
 (defn symbol [sym]
-  (make-node :atom (core/list (name sym))))
+  (make-node :atom (core/vector (name sym))))
 
-(def empty-map (make-node :map (core/list "{" "}")))
+(def empty-map (make-node :map (core/vector "{" "}")))
 
-(def whitespace (make-node :whitespace '(" ")))
+(def whitespace (make-node :whitespace '[" "]))
 
 (def composite-tag?
      ^{:doc "Returns true if tag is from a composite node"}
@@ -58,7 +59,7 @@
 
 (declare walk)
 
-(defn- replacement-for-composite [tag f]
+(defn- replacement-fn [tag f]
   (if (composite-tag? tag)
     #(walk f %)
     f))
@@ -66,7 +67,7 @@
 (defn- replacement-for-content [tag f content]
   (replace-when
    (complement string?)
-   (replacement-for-composite tag f)
+   (replacement-fn tag f)
    content))
 
 (defn- walk-replace-content [f ast]

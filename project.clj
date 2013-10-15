@@ -1,5 +1,9 @@
-(defproject joodie/clojure-refactoring "0.6.5-SNAPSHOT"
-  :description "Clojure refactoring for Emacs/SLIME"
-  :dependencies [[org.clojure/clojure "1.2.0"]
+(defproject yehe/clojure-refactoring "0.9.0"
+  :description "Clojure refactoring for Emacs/nREPL"
+  :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojure-contrib "1.2.0"]
-                 [net.cgrand/parsley "0.8.0"]])
+                 [net.cgrand/parsley "0.9.1"]
+                 [midje "1.5.0"]
+                 [org.clojure/tools.namespace "0.2.2"]]
+  :plugins [[lein-midje "3.0.0"]]
+  :profiles {:dev {:dependencies [[org.clojure/tools.trace "0.7.5"]]}})

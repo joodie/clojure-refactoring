@@ -45,11 +45,11 @@
       :new-source (ast/ast->string
                    replacement)})))
 
-(defn replace-namespaces [namespaces f]
+(defn replace-in-namespaces [namespaces f]
   "Replaces vars by calling f on each one."
   (remove empty?
           (map #(map-to-alist (build-replacement-map % f)) namespaces)))
 
 (defn replace-callers [v f]
   "Replaces all callers of a var by calling a function on them."
-  (replace-namespaces (namespaces-who-refer-to v) f))
+  (replace-in-namespaces (namespaces-who-refer-to v) f))

@@ -14,6 +14,7 @@
 
 ;; Copyright (c) 2009, 2010, Tom Crayford,
 ;;           (c) 2011, Joost Diepenmaat, Zeekat Softwareontwikkeling
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -44,37 +45,87 @@
 
 (require 'thingatpt)
 (require 'cl)
+(require 'nrepl)
+(require 'paredit)
+
 (defvar clojure-refactoring-mode-hook '()
   "Hooks to be run when loading clojure refactoring mode")
 
-(defun clojure-refactoring-eval-sync (string)
-  (slime-eval `(swank:eval-and-grab-output ,string)))
-
-(setq clojure-refactoring-refactorings-list
+(setq clojure-refactoring-command-list
       (list "extract-fn" "thread-last" "extract-global" "thread-first" "unthread" "extract-local" "destructure-map" "rename" "global-rename"))
 
-(setq clojure-refactoring-refactorings-alist
+(setq clojure-refactoring-command-alist
       (mapcar (lambda (refactoring) (list refactoring))
-              clojure-refactoring-refactorings-list))
+              clojure-refactoring-command-list))
 
 (defun clojure-refactoring-prompt ()
   (interactive)
-  (if (and (fboundp 'slime-connected-p)
-           (slime-connected-p))
-      (let ((refactoring (completing-read "Refactoring: " clojure-refactoring-refactorings-alist nil nil)))
+  (if (and (boundp 'nrepl-connection-buffer)
+           nrepl-connection-buffer)
+      (let ((refactoring (completing-read "Refactoring: " clojure-refactoring-command-alist nil nil)))
         (when (not (string= "" refactoring))
           (call-interactively (intern (concat "clojure-refactoring-" refactoring)))))
-    (error "clojure-refactoring needs a SLIME connection.")))
+    (error "clojure-refactoring needs a nREPL connection.")))
 
 (defun get-sexp ()
+  "Delete and return the innermost sexp the point is on or the mark-region"
   (if mark-active
       (substring-no-properties (delete-and-extract-region (mark) (point)))
-    (let ((out (slime-sexp-at-point)))
+    (let ((out (nrepl-sexp-at-point)))
       (forward-kill-sexp)
       out)))
 
-(defun clojure-refactoring-call (s)
-  (car (cdr (clojure-refactoring-eval-sync s))))
+(defun defun-at-point ()
+   "Return the text of the defun at point."
+   (nrepl-expression-at-point))
+
+(defun clojure-refactoring-nrepl-call (form)
+  (nrepl-interactive-eval-read-print form))
+
+(defun nrepl-interactive-eval-read-replace (form)
+  "Evaluate the given FORM and process global replacement"
+  (let ((buffer (current-buffer)))
+    (nrepl-send-string form
+                       (nrepl-interactive-eval-read-replace-handler buffer)
+                       nrepl-buffer-ns)))
+
+(defun nrepl-interactive-eval-read-replace-handler (buffer)
+  "Make a handler for evaluating and process global replacement."
+  (nrepl-make-response-handler buffer
+                               (lambda (buffer value)
+                                 (with-current-buffer buffer
+                                     (let ((sexp (read value)))
+                                       (if sexp
+                                           (clojure-refactoring-process-global-replacements sexp)))))
+                               '()
+                               (lambda (buffer err)
+                                 (message "%s" err))
+                               '()))
+
+(defun nrepl-interactive-eval-read-print (form)
+  "Evaluate the given FORM and print sexp read from form string in current buffer."
+  (let ((buffer (current-buffer)))
+    (nrepl-send-string form
+                       (nrepl-interactive-eval-read-print-handler buffer)
+                       nrepl-buffer-ns)))
+
+(defun nrepl-interactive-eval-read-print-handler (buffer)
+  "Make a handler for evaluating and printing result in BUFFER."
+  (nrepl-make-response-handler buffer
+                               (lambda (buffer value)
+                                 (with-current-buffer buffer
+                                   (let ((sexp (read value)))
+                                     (if sexp
+                                         (progn
+                                           (insert sexp)
+                                           (beginning-of-defun)
+                                           (indent-sexp))))))
+                               '()
+                               (lambda (buffer err)
+                                 (message "%s" err))
+                               '()))
+
+
 
 (defun forward-kill-sexp ()
   (interactive)
@@ -95,39 +146,41 @@
   (apply 'clojure-refactoring-format-clojure-call ns name (mapcar #'clojure-refactoring-wrap-as-string args)))
 
 (defun clojure-refactoring-call-with-string-args (&rest args)
-  (clojure-refactoring-call
+  (clojure-refactoring-nrepl-call
    (apply 'clojure-refactoring-format-call-with-string-args args)))
-
-(defun clojure-refactoring-insert-sexp (s)
-  (insert (read s)))
 
 (defun clojure-refactoring-extract-fn (fn-name)
   "Extracts the expression at point into a function. Moves point
 to args of new function (where the doc string should be)."
   (interactive "sFunction name: ")
-  (let ((defn (slime-defun-at-point))
+  (let ((defn (defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
-      (clojure-refactoring-insert-sexp
-       (clojure-refactoring-call-with-string-args
-        "extract-method" "extract-method"
-        defn body fn-name)))
-    (indent-sexp)
-    (next-line)
-    (right-char 2)))
+      (clojure-refactoring-call-with-string-args
+       "extract-method" "extract-method"
+       defn body fn-name))))
+
+(defun clojure-refactoring-inline ()
+  "Inline the function and move to the begining of the expression"
+  (interactive)
+  (let ((defun-at-point)
+        (call (get-sexp)))
+    (save-excursion
+      (beginning-of-defun)
+      (forward-kill-sexp)
+      (clojure-refactoring-call-with-string-args
+       "inline-method" "inline-method"
+       defn body))))
 
 (defun clojure-refactoring-thread-expr (str)
   (let ((body (get-sexp)))
     (save-excursion
-      (clojure-refactoring-insert-sexp
-       (clojure-refactoring-call-with-string-args
-        "thread-expression"
-        (format "thread-%s" str)
-        body))
-      (beginning-of-defun)
-      (indent-sexp))))
+      (clojure-refactoring-call-with-string-args
+       "thread-expression"
+       (format "thread-%s" str)
+       body))))
 
 (defun clojure-refactoring-thread-last ()
   (interactive)
@@ -153,27 +206,23 @@ to args of new function (where the doc string should be)."
       (mark-sexp)
       (let ((body (buffer-substring-no-properties (mark t) (point))))
         (forward-kill-sexp)
-        (clojure-refactoring-insert-sexp
-         (clojure-refactoring-call-with-string-args
-          "rename"
-          "rename"
-          body
-          old-name
-          new-name))))))
+        (clojure-refactoring-call-with-string-args
+         "rename"
+         "rename"
+         body
+         old-name
+         new-name)))))
 
 (defun clojure-refactoring-reload-all-user-ns ()
-  (clojure-refactoring-eval-sync "(require 'clojure-refactoring.support.source)(clojure-refactoring.support.source/reload-all-user-ns)"))
+  (nrepl-interactive-eval "(require 'clojure-refactoring.support.source)(clojure-refactoring.support.source/reload-all-user-ns)"))
 
 (defun clojure-refactoring-global-rename (new-name)
   (interactive "sNew name: ")
   (let ((old-name (clojure-refactoring-read-symbol-at-point)))
     (save-some-buffers 't)
     (let ((expr (format "(require 'clojure-refactoring.rename) (ns clojure-refactoring.rename) (global-rename '%s '%s '%s)"
-                        (slime-current-package) old-name new-name)))
-      (clojure-refactoring-process-global-replacements
-       (read (clojure-refactoring-call
-              expr)))))
-  (save-some-buffers 't)
+                        (nrepl-find-ns) old-name new-name)))
+      (nrepl-interactive-eval-read-replace expr)))
   (clojure-refactoring-reload-all-user-ns))
 
 (defun clojure-refactoring-extract-global (var-name)
@@ -190,30 +239,28 @@ to args of new function (where the doc string should be)."
 
 (defun clojure-refactoring-extract-local (var-name)
   (interactive "sVarable name: ")
-  (let ((defn (slime-defun-at-point))
+  (let ((defn (defun-at-point))
         (body (get-sexp)))
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
-      (clojure-refactoring-insert-sexp
-       (clojure-refactoring-call-with-string-args
-        "local-binding"
-        "local-wrap"
-        defn
-        body
-        var-name)))))
+      (clojure-refactoring-call-with-string-args
+       "local-binding"
+       "local-wrap"
+       defn
+       body
+       var-name))))
 
-(defun clojure-refactoring-destructure-map (map-name)
-  (interactive "sMap name: ")
-  (let ((defn (slime-defun-at-point)))
+(defun clojure-refactoring-destructure-map ()
+  (interactive)
+  (let ((defn (defun-at-point)))
     (save-excursion
       (beginning-of-defun)
       (forward-kill-sexp)
-      (clojure-refactoring-insert-sexp
-       (clojure-refactoring-call-with-string-args
-        "destructuring"
-        "destructure-map"
-        defn)))))
+      (clojure-refactoring-call-with-string-args
+       "destructuring"
+       "destructure-map"
+       defn))))
 
 (defun get-from-alist (key alist)
   (car (cdr (assoc key alist))))
@@ -236,6 +283,15 @@ to args of new function (where the doc string should be)."
 (defvar clojure-refactoring-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-f") 'clojure-refactoring-prompt)
+    (define-key map (kbd "C-c M-m") 'clojure-refactoring-extract-fn)
+    (define-key map (kbd "C-c M-v") 'clojure-refactoring-extract-local)
+    (define-key map (kbd "C-c M-r") 'clojure-refactoring-rename)
+    (define-key map (kbd "C-c M-g") 'clojure-refactoring-global-rename)
+    (define-key map (kbd "C-c M-d") 'clojure-refactoring-destructure-map)
+    (define-key map (kbd "C-c M-l") 'clojure-refactoring-thread-last)
+    (define-key map (kbd "C-c M-f") 'clojure-refactoring-thread-first)
+    (define-key map (kbd "C-c M-u") 'clojure-refactoring-unthread)
+    (define-key map (kbd "C-c M-i") 'clojure-refactoring-inline)
     map)
   "Keymap for Clojure refactoring mode.")
 
@@ -246,9 +302,9 @@ to args of new function (where the doc string should be)."
 (progn (defun clojure-refactoring-enable ()
          (clojure-refactoring-mode t))
        (add-hook 'clojure-mode-hook 'clojure-refactoring-enable)
-       (add-hook 'slime-mode-hook '(lambda () (when (and (string= "Clojure" mode-name)
-                                                    (not (bound-and-true-p clojure-refactoring-mode)))
-                                           (clojure-refactoring-enable)))))
+       (add-hook 'nrepl-mode-hook '(lambda () (when (and (string= "Clojure" mode-name)
+                                                         (not (bound-and-true-p clojure-refactoring-mode)))
+                                                (clojure-refactoring-enable)))))
 
 (provide 'clojure-refactoring-mode)
 ;;; clojure-refactoring-mode.el ends here

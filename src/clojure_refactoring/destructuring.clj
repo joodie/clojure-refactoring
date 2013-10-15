@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -26,12 +27,12 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.destructuring
-  (:use clojure.walk
-        [clojure-refactoring.support core]
-        [clojure.contrib.seq-utils :only [find-first]]
-        [clojure.contrib.str-utils :only [str-join]]
-        [clojure-refactoring.ast :only [defparsed-fn]])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:use [clojure-refactoring.support.core])
+  (:require [clojure-refactoring.ast :as ast]
+            [clojure-refactoring.ast :refer [defparsed-fn]]
+            [clojure.contrib.str-utils :refer [str-join]]
+            [clojure.contrib.seq-utils :refer [find-first]]
+            [clojure-refactoring.support.parsley-walk :as parsley-walk]))
 
 (defn map-lookup? [ast]
   (let [content (ast/relevant-content ast)]
@@ -41,7 +42,7 @@
 
 (defn key->sym [kw-node]
   (ast/replace-content kw-node
-    (list
+    (vector
      (str-join ""
             (drop 1 (first (:content kw-node)))))))
 
@@ -61,22 +62,26 @@
   (ast/replace-content ast
     (swap-first-with-last ast)))
 
+(defn new-fcuntion
+  [maybe-keyword lookup-ast]
+  (if (ast/keyword? maybe-keyword)
+      lookup-ast
+      (parsley-swap-first-with-last lookup-ast)))
+
 (defn lookup->canoninical-form [lookup-ast]
   (let [[maybe-keyword] (ast/relevant-content lookup-ast)]
-    (if (ast/keyword? maybe-keyword)
-      lookup-ast
-      (parsley-swap-first-with-last lookup-ast))))
+    (new-fcuntion maybe-keyword lookup-ast)))
 
 (defn add-to-parsley-map [m key val]
   "Adds key and value (which should be parsley nodes
   to m, which represents a parsley map."
   (ast/replace-content m
-    `("{"
-      ~key
-      ~ast/whitespace
-      ~val
-      ~ast/whitespace
-      ~@(drop 1 (:content m)))))
+                       `["{"
+                         ~key
+                         ~ast/whitespace
+                         ~val
+                         ~ast/whitespace
+                         ~@(drop 1 (:content m))]))
 
 (def relevant-content-from-canoninical-form
      (comp ast/relevant-content lookup->canoninical-form))
@@ -98,7 +103,7 @@
 
 (defn- destructured-binding-vec [old-vec lookups]
   "Replaces each key in the binding map found in old-vec with the value\nfrom the binding map"
-  (postwalk-replace (lookups-to-binding-map lookups) old-vec))
+  (parsley-walk/postwalk-replace (lookups-to-binding-map lookups) old-vec))
 
 (defn replace-lookups-with-destructured-symbols [lookups ast]
   ;;TODO: this bothers me, because we use this pattern of reduce
@@ -112,7 +117,7 @@
    ast
    lookups))
 
-(defn- add-destructured-maps-to-args [lookups root-ast]
+(defn- ast-with-new-arglist [lookups root-ast]
   (let [args (ast/parsley-fn-args root-ast)
         new-args (destructured-binding-vec args lookups)]
     (ast/tree-replace args new-args root-ast)))
@@ -123,4 +128,4 @@
     (ast/ast->string
      (replace-lookups-with-destructured-symbols
        lookups
-       (add-destructured-maps-to-args lookups root-ast)))))
+       (ast-with-new-arglist lookups root-ast)))))

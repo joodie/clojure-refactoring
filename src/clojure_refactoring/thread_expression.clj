@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -26,11 +27,11 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.thread-expression
-  (:use [clojure-refactoring.support core]
-        [clojure.walk :only [postwalk]]
-        clojure-refactoring.support.formatter)
-  (:require [clojure-refactoring.support.parser :as parser])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:require [clojure-refactoring.ast :as ast]
+            [clojure-refactoring.support.parser :as parser]
+            [clojure-refactoring.support.formatter :refer [format-ast]]
+            [clojure.walk :refer [postwalk]]
+            [clojure-refactoring.support.core :refer [all-of? but-second format-code tree-contains?]]))
 
 (def expression-threaders '#{->> -> clojure.core/->> clojure.core/->})
 
@@ -70,11 +71,9 @@ based on what type of threading is going to be"
   (and (ast/tag= :list (position-f ast))
        (ast/tag= :list (position-f (position-f ast)))))
 
-(defn finish-threading [{content :content :as node}
-                        new-ast thread-type]
+(defn finish-threading [node new-ast thread-type]
   (let [{:keys [position-f all-but-position-f]}
-        (threading-fns-from-type thread-type)
-        useful-content (ast/relevant-content node)]
+        (threading-fns-from-type thread-type)]
     (ast/conj
      new-ast
      (position-f node)
@@ -83,10 +82,11 @@ based on what type of threading is going to be"
 (defn thread-with-type [thread-type ast]
   (let [{:keys [position-f all-but-position-f]}
         (threading-fns-from-type thread-type)]
-    (loop [node ast new-node ast/empty-list]
+    (loop [node ast
+           new-node ast/empty-list]
       (if (not-last-threading-node? node position-f)
-        (recur (position-f  node)
-               (ast/conj new-node (all-but-position-f node)))
+        (recur (position-f node)
+               (ast/conj new-node (apply ast/list-without-whitespace (all-but-position-f node))))
         (finish-threading node new-node thread-type)))))
 
 (defn thread-ast [thread-type ast]

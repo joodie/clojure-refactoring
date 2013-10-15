@@ -58,7 +58,7 @@
   (let [with-whitespace
         (add-whitespace-to-lists ast)]
     (ast/replace-content
-      with-whitespace
+     with-whitespace
      (after-each #(replace-this-when-threading % with-whitespace)
                  threading-spacing
                  (:content with-whitespace)))))

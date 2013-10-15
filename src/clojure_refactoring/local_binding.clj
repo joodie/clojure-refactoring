@@ -1,4 +1,5 @@
 ;; Copyright (c) 2010 Tom Crayford,
+;;           (c) 2012, 2013, Ye He
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -26,11 +27,9 @@
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns clojure-refactoring.local-binding
-  (:use clojure.walk
-        [clojure-refactoring.support core formatter]
-        [clojure.contrib.seq-utils :only (find-first)]
-        [clojure-refactoring.ast :only [defparsed-fn]])
-  (:require [clojure-refactoring.ast :as ast]))
+  (:require [clojure-refactoring.ast :as ast]
+            [clojure-refactoring.ast :refer [defparsed-fn]]
+            [clojure.contrib.seq-utils :refer [find-first]]))
 
 (defn- get-function-definition [defn-ast]
   (find-first (ast/tag= :list) (:content defn-ast)))
@@ -65,6 +64,7 @@
       ast/whitespace
       (ast/vector
        [var-name value])
+      ast/newline
       ast/whitespace
       form)))
 
